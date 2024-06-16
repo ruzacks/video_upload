@@ -1,0 +1,10 @@
+{
+    "html-related-links.include": {
+    "php": [
+      "(?:require|include)(?:_once)?\\('([^']+)'\\)",
+      "(?:require|include)(?:_once)? '([^']+)'",
+      "(?:require|include)(?:_once)?\\(\"([^\"]+)\"\\)",
+      "(?:require|include)(?:_once)? \"([^\"]+)\""
+    ]
+  }
+}
