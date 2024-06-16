@@ -344,18 +344,11 @@ mysqli_close($conn);
       <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
 
       <script>
-         async function loadDesaData() {
-            try {
-               await getDesa();
-               await getDataDesa();
-               console.log('Both getDesa and getDataDesa completed');
-            } catch (error) {
-               console.error('An error occurred:', error);
-            }
-         }
+         getDesa();
 
-         // Call the async function
-         loadDesaData();
+         setTimeout(function() {
+            getDataDesa();
+         }, 1500);
 
          function resetFilter(){
             $('#filter-nik').val('');
@@ -379,8 +372,7 @@ mysqli_close($conn);
             getDataDesa();
          }
 
-         async function getDataDesa(page = 1){
-            return new Promise((resolve, reject) => {
+         function getDataDesa(page = 1){
             $.ajax({
                url: 'ajax.php',
                method: 'POST',
@@ -556,44 +548,41 @@ mysqli_close($conn);
 
                }
             });
-         });
          }
 
          $('#filter-kecamatan').change(function() {
             getDesa();
          });
 
-         async function getDesa() {
+         function getDesa(){
             var idKecamatan = $('#filter-kecamatan').val();
-            return new Promise((resolve, reject) => {
-               $.ajax({
-                  url: 'ajax.php',
-                  method: 'POST',
-                  data: {
-                     func: 'getDesa',
-                     username: $('#username').val(),
-                     id_kecamatan: idKecamatan
-                  },
-                  success: function(response) {
-                     var data = response;
-                     var desaSelect = $('#filter-desa');
 
-                     // Clear previous options
-                     desaSelect.empty();
-                     desaSelect.append('<option value="">Pilih Desa</option>');
+            $.ajax({
+               url: 'ajax.php',
+               method: 'POST',
+               data: {
+                  func: 'getDesa',
+                  username: $('#username').val(),
+                  id_kecamatan: idKecamatan
+               },
+               success: function(response) {
+                  var data = response;
+                  var desaSelect = $('#filter-desa');
 
-                     // Populate new options
-                     data.listDesa.forEach(function(desa) {
-                           desaSelect.append('<option value="' + desa.id_desa + '">' + desa.nama_desa + '</option>');
-                     });
+                  // Clear previous options
+                  desaSelect.empty();
+                  desaSelect.append('<option value="">Pilih Desa</option>');
 
-                     // Set the current user's desa if it exists
-                     if (data.currentUserIdDesa !== null) {
-                           desaSelect.val(data.currentUserIdDesa);
-                     }
-                     
+                  // Populate new options
+                  data.listDesa.forEach(function(desa) {
+                        desaSelect.append('<option value="' + desa.id_desa + '">' + desa.nama_desa + '</option>');
+                  });
+
+                  // Set the current user's desa if it exists
+                  if (data.currentUserIdDesa !== null) {
+                        desaSelect.val(data.currentUserIdDesa);
                   }
-               });
+               }
             });
          }
       </script>
