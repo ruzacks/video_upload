@@ -365,9 +365,7 @@ if($_SESSION['role'] == 'kordes'){
                         timerProgressBar: true,
                         didClose: () => {
                             if (response.status === "success") {
-                                setTimeout(function() {
-                                    location.reload();
-                                }, 1500);
+                               getAllUser();
                             } 
                         }
                     });

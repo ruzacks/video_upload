@@ -472,6 +472,7 @@ mysqli_close($conn);
                                                    'success'
                                                 );
                                                 tr.remove();
+                                                getDataDesa();
                                           } else {
                                                 Swal.fire(
                                                    'Error!',
