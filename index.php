@@ -344,13 +344,18 @@ mysqli_close($conn);
       <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
 
       <script>
-         getDesa().then(() => {
-            return getDataDesa();
-         }).then(() => {
-            console.log('Both getDesa and getDataDesa completed');
-         }).catch((error) => {
-            console.error('An error occurred:', error);
-         });
+         async function loadDesaData() {
+            try {
+               await getDesa();
+               await getDataDesa();
+               console.log('Both getDesa and getDataDesa completed');
+            } catch (error) {
+               console.error('An error occurred:', error);
+            }
+         }
+
+         // Call the async function
+         loadDesaData();
 
          function resetFilter(){
             $('#filter-nik').val('');
@@ -374,7 +379,8 @@ mysqli_close($conn);
             getDataDesa();
          }
 
-         function getDataDesa(page = 1){
+         async function getDataDesa(page = 1){
+            return new Promise((resolve, reject) => {
             $.ajax({
                url: 'ajax.php',
                method: 'POST',
@@ -550,13 +556,14 @@ mysqli_close($conn);
 
                }
             });
+         });
          }
 
          $('#filter-kecamatan').change(function() {
             getDesa();
          });
 
-         function getDesa(){
+         async function getDesa() {
             var idKecamatan = $('#filter-kecamatan').val();
             return new Promise((resolve, reject) => {
                $.ajax({
