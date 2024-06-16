@@ -1,5 +1,5 @@
 ---
 deployment:
   tasks:
-       - export DEPLOYPATH=/home/k16n7761/public_html/video.k168.my.id/public_html/
+       - export DEPLOYPATH=/home/verb4874/public_html/
        - /bin/cp -R * $DEPLOYPATH
