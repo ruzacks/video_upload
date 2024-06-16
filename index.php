@@ -344,8 +344,13 @@ mysqli_close($conn);
       <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
 
       <script>
-         getDesa();
-         
+         getDesa().then(() => {
+            return getDataDesa();
+         }).then(() => {
+            console.log('Both getDesa and getDataDesa completed');
+         }).catch((error) => {
+            console.error('An error occurred:', error);
+         });
 
          function resetFilter(){
             $('#filter-nik').val('');
@@ -553,34 +558,35 @@ mysqli_close($conn);
 
          function getDesa(){
             var idKecamatan = $('#filter-kecamatan').val();
+            return new Promise((resolve, reject) => {
+               $.ajax({
+                  url: 'ajax.php',
+                  method: 'POST',
+                  data: {
+                     func: 'getDesa',
+                     username: $('#username').val(),
+                     id_kecamatan: idKecamatan
+                  },
+                  success: function(response) {
+                     var data = response;
+                     var desaSelect = $('#filter-desa');
 
-            $.ajax({
-               url: 'ajax.php',
-               method: 'POST',
-               data: {
-                  func: 'getDesa',
-                  username: $('#username').val(),
-                  id_kecamatan: idKecamatan
-               },
-               success: function(response) {
-                  var data = response;
-                  var desaSelect = $('#filter-desa');
+                     // Clear previous options
+                     desaSelect.empty();
+                     desaSelect.append('<option value="">Pilih Desa</option>');
 
-                  // Clear previous options
-                  desaSelect.empty();
-                  desaSelect.append('<option value="">Pilih Desa</option>');
+                     // Populate new options
+                     data.listDesa.forEach(function(desa) {
+                           desaSelect.append('<option value="' + desa.id_desa + '">' + desa.nama_desa + '</option>');
+                     });
 
-                  // Populate new options
-                  data.listDesa.forEach(function(desa) {
-                        desaSelect.append('<option value="' + desa.id_desa + '">' + desa.nama_desa + '</option>');
-                  });
-
-                  // Set the current user's desa if it exists
-                  if (data.currentUserIdDesa !== null) {
-                        desaSelect.val(data.currentUserIdDesa);
+                     // Set the current user's desa if it exists
+                     if (data.currentUserIdDesa !== null) {
+                           desaSelect.val(data.currentUserIdDesa);
+                     }
+                     
                   }
-                  getDataDesa();
-               }
+               });
             });
          }
       </script>
