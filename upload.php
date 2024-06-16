@@ -53,7 +53,7 @@ if (isset($_FILES['video']) && $_FILES['video']['error'] === UPLOAD_ERR_OK) {
     if (in_array($fileExtension, $allowedfileExtensions)) {
         // Directory to save the uploaded video file
         // Ensure the directory path ends with a slash or backslash
-        $uploadFileDir = 'D:/xampp8/htdocs/video_upload/videos/';
+        $uploadFileDir = $myPath;
         
         $dest_path = $uploadFileDir . $newFileName;
 
