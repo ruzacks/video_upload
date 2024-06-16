@@ -1,13 +1,21 @@
 <?php include('page-protection.php') ?>
 <?php include('connection.php') ?>
+<?php include('lib-data.php') ?>
+
 <?php
 
-if(($_SESSION['role'] == 'koordinator' || $_SESSION['role'] == 'korcam') && (!isset($_GET['id_kec']) || !isset($_GET['id_des']))){
+if ($_SESSION['role'] == 'koordinator' || $_SESSION['role'] == 'korcam') {
    $idKec = $_SESSION['id_kecamatan'];
-   header("Location: index.php?id_kec=$idKec");
-} else if($_SESSION['role'] =='kordes' && !isset($_GET['id_des'])){
+   if (!isset($_GET['id_kec']) || $_GET['id_kec'] != $idKec) {
+       header("Location: index.php?id_kec=$idKec");
+       exit;
+   }
+} else if ($_SESSION['role'] == 'kordes') {
    $idDes = $_SESSION['id_desa'];
-   header("Location: index.php?id_des=$idDes");
+   if (!isset($_GET['id_des']) || $_GET['id_des'] != $idDes) {
+       header("Location: index.php?id_des=$idDes");
+       exit;
+   }
 }
 
 $conn = getConn();
@@ -54,6 +62,46 @@ mysqli_close($conn);
       <link rel="stylesheet" href="css/style.css">
       <!-- Responsive CSS -->
       <link rel="stylesheet" href="css/responsive.css">
+      <style>
+
+         .red-font {
+            color: red;
+         }
+         
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead {
+            position: -webkit-sticky; /* For Safari */
+            position: sticky;
+            top: 0;
+            background-color: #fff; /* Add background color to prevent content overlap */
+            z-index: 1; /* Ensure the header is above table content */
+            border: 1px solid #ddd;
+            padding: 8px;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        tbody tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        .table-container {
+            max-height: 600px; /* Adjust as needed */
+            overflow-y: auto;
+        }
+    </style>
    </head>
    <body>
       <!-- loader Start -->
@@ -85,7 +133,7 @@ mysqli_close($conn);
          <div id="content-page" class="content-page">
             <div class="container-fluid">
                <div class="row">
-                  <div class="col-md-6 col-lg-12">
+                  <div class="col-md-6 col-lg-6">
                      <div class="iq-card iq-card-block iq-card-stretch iq-card-height overflow-hidden">
                         <div class="iq-card-body pb-0">
                            <div class="rounded-circle iq-card-icon iq-bg-success"><i class="ri-group-line"></i></div>
@@ -99,24 +147,124 @@ mysqli_close($conn);
                         <div id="chart-3"></div>
                      </div>
                   </div>
+                  <div class="col-md-6 col-lg-6">
+                     <div class="iq-card iq-card-block iq-card-stretch iq-card-height overflow-hidden">
+                        <div class="iq-card-body pb-0">
+                        <?php 
+                           if(isset($_GET['id_kec'])){
+                              include("summary-desa.php");
+                           } else if(isset($_GET['id_des'])){
+                              ?>
+                              <div class="text-center">
+                                 <h2 class="mb-0"><span class="counter"><?= $jumlahData ?></span></h2>
+                              </div>
+                              <?php
+                           } else {
+                              include('summary-kecamatan.php'); 
+                           }
+                           
+                        ?>
+                           
+                        </div>
+                        <div id="chart-2"></div>
+                     </div>
+                  </div>
                </div>
                <div class="row">
-                  <?php 
-                  if(isset($_GET['id_kec'])){
-                     include("summary-desa.php");
-                  } else if(isset($_GET['id_des'])){
-                     
-                  } else {
-                     include('summary-kecamatan.php'); 
-                  }
-                  
-                  ?>
+                 
                </div>
-                  <?php 
-                        if(isset($_GET['id_des'])){
-                           include("tabel-data-video.php");
-                        }
-                     ?>
+               <div class="row">
+                  <div class="col-lg-12">
+                     <div class="iq-card">
+                     <div class="iq-card-header d-flex justify-content-between">
+                           <div class="iq-header-title">
+                              <h4 class="card-title">Summary Data</h4>
+                              
+                           </div>
+                           <div class="iq-card-header-toolbar d-flex align-items-center">
+                              <div class="dropdown">
+                                 <span class="dropdown-toggle text-primary" id="dropdownMenuButton5" data-toggle="dropdown">
+                                 <i class="ri-more-2-fill"></i>
+                                 </span>
+                                 <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuButton">
+                                 <a class="dropdown-item" href="#"><i class="ri-eye-fill mr-2"></i>View</a>
+                                 <a class="dropdown-item" href="#"><i class="ri-delete-bin-6-fill mr-2"></i>Delete</a>
+                                 <a class="dropdown-item" href="#"><i class="ri-pencil-fill mr-2"></i>Edit</a>
+                                 <a class="dropdown-item" href="#"><i class="ri-printer-fill mr-2"></i>Print</a>
+                                 <a class="dropdown-item" href="#"><i class="ri-file-download-fill mr-2"></i>Download</a>
+                                 </div>
+                              </div>
+                           </div>
+                     </div>
+                     <input type="hidden" id="username" value="<?= $_SESSION['role'] == 'kordes' ? $_SESSION['username'] : '' ?>">
+                     <div class="iq-card-body">
+                           <div class="table-responsive">
+                              <table id="tableDataVideo" class="table mb-0 table-borderless">
+                                 <thead>
+                                 <tr>
+                                       <th><input class="form-control" style="max-width: 150px;" type="text" id="filter-nik" placeholder="Filter NIK"></th>
+                                       <th><input class="form-control" style="width: 150px;" type="date" id="filter-upload-date" placeholder="Filter Upload Date"></th>
+                                       <th>
+                                          <select class="form-control" id="filter-kecamatan" name="filter-kecamatan" <?= ($_SESSION['role'] != 'administrator' ) ? 'style="pointer-events: none;"' : ''; ?> > 
+                                             <option value="">Pilih Kecamatan</option>
+                                             <?php
+                                                foreach ($kecamatans as $kecamatan){
+                                                   ?>
+                                                      <option value="<?php echo $kecamatan->id_kecamatan; ?>" <?= ($_SESSION['role'] != 'administrator'  && $_SESSION['id_kecamatan'] == $kecamatan->id_kecamatan) ? 'selected' : ''; ?> ><?php echo $kecamatan->nama_kecamatan; ?></option>
+
+                                                   <?php
+                                                }
+                                             ?>
+                                          </select> 
+                                       </th>
+                                       <th>
+                                          <select class="form-control" id="filter-desa" name="filter-desa" <?= ($_SESSION['role'] == 'kordes' ) ? 'style="pointer-events: none;"' : ''; ?> > 
+                                             <option value="">Pilih Desa</option>
+                                          </select>
+                                       </th>
+                                       <th><input class="form-control" style="width: 150px;" type="text" id="filter-upload-by" placeholder="Upload By"></th>
+                                       <th scope="col"></th>
+                                       <th>
+                                          <button type="button" id="filter-button" onclick="getDataDesa()" class="btn btn-primary">Filter</button>
+                                          <button type="button" id="reset-button" onclick="resetFilter()" class="btn btn-secondary">Reset</button>
+                                       </th>
+                                 </tr>
+                                 <tr>
+                                       <th scope="col">NIK</th>
+                                       <th scope="col">Tanggal Upload</th>
+                                       <th scope="col">Nama Kecamatan</th>
+                                       <th scope="col">Nama Desa</th>
+                                       <th scope="col">Upload By</th>
+                                       <th scope="col">Video</th>
+                                       <th scope="col">Action</th>
+                                 </tr>
+                                 </thead>
+                                 <tbody>
+                                 
+                                 </tbody>
+                              </table>
+                              <div class="col">                           
+                                       <nav aria-label="Page navigation example" style="margin-top: 20px;">
+                                       <ul class="pagination justify-content-end" id="pagination" style="cursor:pointer">
+                                       <li class="page-item disabled">
+                                          <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Previous</a>
+                                       </li>
+                                       <li class="page-item"><a class="page-link" href="#">1</a></li>
+                                       <li class="page-item"><a class="page-link" href="#">2</a></li>
+                                       <li class="page-item"><a class="page-link" href="#">3</a></li>
+                                       <li class="page-item">
+                                          <a class="page-link" href="#">Next</a>
+                                       </li>
+                                       </ul>
+                                 </nav>
+                              </div>
+                              <span id="totalRecords"></span>
+                           </div>
+                     </div>
+                     </div>
+                  </div>
+               </div>
+
             </div>
          </div>
       </div>
@@ -196,8 +344,30 @@ mysqli_close($conn);
       <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
 
       <script>
-
+         getDesa();
          getDataDesa();
+
+         function resetFilter(){
+            $('#filter-nik').val('');
+            <?php 
+               if($_SESSION['role'] == 'administrator'){
+                  ?>
+                  $('#filter-kecamatan').val('');
+                  <?php
+               }
+            ?>
+            <?php 
+               if($_SESSION['role'] != 'kordes'){
+                  ?>
+                  $('#filter-desa').val('');
+                  <?php
+               }
+            ?>
+            $('#filter-upload-date').val('');
+            $('#filter-upload-by').val('');
+
+            getDataDesa();
+         }
 
          function getDataDesa(page = 1){
             $.ajax({
@@ -205,8 +375,12 @@ mysqli_close($conn);
                method: 'POST',
                data: {
                      func: 'getDataDesa',
-                     id_desa: $('#id_desa').val(),
-                     page: page
+                     page: page,
+                     nik: $('#filter-nik').val(),
+                     id_kec: $('#filter-kecamatan').val(),
+                     id_des: $('#filter-desa').val(),
+                     upload_date: $('#filter-upload-date').val(),
+                     upload_by: $('#filter-upload-by').val(),
                },
                success: function(response) {
                      const data = JSON.parse(response);
@@ -233,6 +407,10 @@ mysqli_close($conn);
                         tdDesa.textContent = item.nama_desa;
                         tr.appendChild(tdDesa);
 
+                        const tdUploadBy = document.createElement('td');
+                        tdUploadBy.textContent = item.upload_by;
+                        tr.appendChild(tdUploadBy);
+
                         const tdVideo = document.createElement('td');
                         const playButton = document.createElement('button');
                         playButton.textContent = 'Play Video';
@@ -257,7 +435,7 @@ mysqli_close($conn);
 
                         const deleteButton = document.createElement('button');
                         deleteButton.textContent = 'Delete';
-                        deleteButton.className = 'btn btn-danger';
+                        deleteButton.className = 'btn btn-danger mx-2';
                         deleteButton.onclick = function() {
                            Swal.fire({
                               title: 'Are you sure?',
@@ -358,6 +536,48 @@ mysqli_close($conn);
                      };
                      nextPage.appendChild(nextLink);
                      pagination.appendChild(nextPage);
+
+                     //dislpay total records
+                     const totalRecords = document.getElementById('totalRecords');
+                     totalRecords.innerHTML = '';
+                     totalRecords.textContent = data.totalRecordFound + ' Data found(s)';
+
+               }
+            });
+         }
+
+         $('#filter-kecamatan').change(function() {
+            getDesa();
+         });
+
+         function getDesa(){
+            var idKecamatan = $('#filter-kecamatan').val();
+
+            $.ajax({
+               url: 'ajax.php',
+               method: 'POST',
+               data: {
+                  func: 'getDesa',
+                  username: $('#username').val(),
+                  id_kecamatan: idKecamatan
+               },
+               success: function(response) {
+                  var data = response;
+                  var desaSelect = $('#filter-desa');
+
+                  // Clear previous options
+                  desaSelect.empty();
+                  desaSelect.append('<option value="">Pilih Desa</option>');
+
+                  // Populate new options
+                  data.listDesa.forEach(function(desa) {
+                        desaSelect.append('<option value="' + desa.id_desa + '">' + desa.nama_desa + '</option>');
+                  });
+
+                  // Set the current user's desa if it exists
+                  if (data.currentUserIdDesa !== null) {
+                        desaSelect.val(data.currentUserIdDesa);
+                  }
                }
             });
          }

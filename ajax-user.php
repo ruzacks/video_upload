@@ -47,15 +47,29 @@ function getAllUser(){
         LEFT JOIN kecamatan ON users.id_kecamatan = kecamatan.id_kecamatan
         LEFT JOIN desa ON users.id_desa = desa.id_desa";
 
-    if ($_SESSION['role'] != 'administrator') {
-        $sql .= " WHERE users.id_kecamatan = '$editorIdKecamatan'";
-
-        if ($_SESSION['role'] == 'koordinator') {
-            $sql .= " AND users.role IN ('korcam', 'kordes')";
-        } else if ($_SESSION['role'] == 'korcam') {
-            $sql .= " AND users.role = 'kordes'";
+        // Apply filters if they are set
+        $filters = [];
+        if (!empty($_GET['username'])) {
+            $username = mysqli_real_escape_string($conn, $_GET['username']);
+            $filters[] = "users.username LIKE '%$username%'";
         }
-    }
+        if (!empty($_GET['role'])) {
+            $role = mysqli_real_escape_string($conn, $_GET['role']);
+            $filters[] = "users.role = '$role'";
+        }
+        if (!empty($_GET['kecamatan'])) {
+            $kecamatan = mysqli_real_escape_string($conn, $_GET['kecamatan']);
+            $filters[] = "users.id_kecamatan LIKE '%$kecamatan%'";
+        }
+        if (!empty($_GET['desa'])) {
+            $desa = mysqli_real_escape_string($conn, $_GET['desa']);
+            $filters[] = "users.id_desa LIKE '%$desa%'";
+        }
+
+        // Append filters to the SQL query
+        if (!empty($filters)) {
+            $sql .= " WHERE " . implode(" AND ", $filters);
+        }
 
 
     $result = mysqli_query($conn, $sql);

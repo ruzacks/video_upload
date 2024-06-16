@@ -1,21 +1,9 @@
-<?php
-    $conn = getConn();
-
-    $idDesa = $_GET['id_des'];
-    $sql = "SELECT nama_desa FROM desa WHERE id_desa = '$idDesa'";
-    $result = mysqli_query($conn, $sql);
-    
-    if ($result) {
-        $row = mysqli_fetch_assoc($result);
-        $namaDesa = $row['nama_desa'];
-    } 
-?>
 <div class="row">
     <div class="col-lg-12">
         <div class="iq-card">
         <div class="iq-card-header d-flex justify-content-between">
             <div class="iq-header-title">
-                <h4 class="card-title">Summary Desa <?= $namaDesa ?></h4>
+                <h4 class="card-title">Summary Data</h4>
                 
             </div>
             <div class="iq-card-header-toolbar d-flex align-items-center">
@@ -33,16 +21,29 @@
                 </div>
             </div>
         </div>
-        <input type="hidden" id="id_desa" value="<?= $_GET['id_des'] ?>">
+        
         <div class="iq-card-body">
             <div class="table-responsive">
                 <table id="tableDataVideo" class="table mb-0 table-borderless">
                     <thead>
                     <tr>
+                        <th><input style="max-width: 150px;" type="text" id="filter-nik" placeholder="Filter NIK"></th>
+                        <th><input style="width: 150px;" type="date" id="filter-upload-date" placeholder="Filter Upload Date"></th>
+                        <th><input style="width: 150px;" type="text" id="filter-kecamatan" placeholder="Filter Kecamatan"></th>
+                        <th><input style="width: 150px;" type="text" id="filter-desa" placeholder="Filter Desa"></th>
+                        <th><input style="width: 150px;" type="text" id="filter-upload-by" placeholder="Upload By"></th>
+                        <th scope="col"></th>
+                        <th>
+                            <button type="button" id="filter-button" onclick="getDataDesa()" class="btn btn-primary">Filter</button>
+                            <button type="button" id="reset-button" onclick="resetFilter()" class="btn btn-secondary">Reset</button>
+                        </th>
+                    </tr>
+                    <tr>
                         <th scope="col">NIK</th>
                         <th scope="col">Tanggal Upload</th>
                         <th scope="col">Nama Kecamatan</th>
                         <th scope="col">Nama Desa</th>
+                        <th scope="col">Upload By</th>
                         <th scope="col">Video</th>
                         <th scope="col">Action</th>
                     </tr>

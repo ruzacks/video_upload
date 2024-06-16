@@ -30,36 +30,13 @@ mysqli_free_result($result); // Free the result set
 mysqli_close($conn); // Close the database connection
 ?>
 
-<div class="col-md-6 col-lg-12">
-    <div class="iq-card">
-        <div class="iq-card-header d-flex justify-content-between">
-            <div class="iq-header-title">
-                <h4 class="card-title">Data Kecamatan <?= $namaKecamatan ?></h4>
-            </div>
-            <div class="iq-card-header-toolbar d-flex align-items-center">
-            </div>
-        </div>
-        <div class="iq-card-body">
-            <?php foreach ($desas as $desa) { ?>
-                <div class="row mt-4">
-                    <div class="col-sm-8">
-                        <div class="media-sellers">
-                            <div class="media-sellers-media-info">
-                                <h5 class="mb-0"><a class="text-dark" href="#"><?= $desa->nama_desa ?></a></h5>
-                                <div class="sellers-dt">
-                                    <span class="font-size-12">Jumlah Data: <?= $desa->count_videos ?></span>
-                                    <!-- Assuming 'Vendor' link is supposed to go to 'Detail desa' -->
-                                    <span class="font-size-12"><a href="index.php?id_des=<?= $desa->id_desa ?>">Lihat Detail</a></span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-sm-4 text-center mt-3">
-                        <h5 class="mb-0"><?= $desa->count_videos ?></h5>
-                        <span>Data</span>
-                    </div>
-                </div>
-            <?php } ?>
-        </div>
+<div class="row">
+<?php foreach ($desas as $desa) { ?>
+    <div class="col-md-5">
+        <h4 class="mb-1"><?= $desa->nama_desa ?></h4>
     </div>
+    <div class="col-md-1 text-end">
+        <h4 class="mb-1"><span class="counter"> <?= $desa->count_videos ?></span></h4>
+    </div>
+<?php } ?>
 </div>

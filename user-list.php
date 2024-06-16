@@ -1,4 +1,6 @@
 <?php include('page-protection.php') ?>
+<?php include('connection.php') ?>
+<?php include('lib-data.php') ?>
 <?php 
 if($_SESSION['role'] == 'kordes'){
    header("Location: not-found.php");
@@ -67,6 +69,47 @@ if($_SESSION['role'] == 'kordes'){
                         <div class="table-responsive">
                            <table id="user-list-table" class="table table-striped table-bordered mt-4" role="grid" aria-describedby="user-list-page-info">
                              <thead>
+                              <tr>
+                                    <th><input class="form-control" style="max-width: 150px;" type="text" id="filter-username" placeholder="Filter Username"></th>
+                                    <th></th>
+                                    <th>
+                                    <select class="form-control" id="filter-role" name="filter-role" required <?php if ($_SESSION['role'] == 'korcam') { ?> style="pointer-events: none;" <?php } ?> >
+                                       <option selected="" disabled="">Select Role</option>
+                                       <?php 
+                                          if($_SESSION['role'] == 'administrator'){
+                                       ?>
+                                          <option value="administrator" >Administrator</option>
+                                          <option value="koordinator" >Koordinator</option>
+                                       <?php 
+                                          } 
+                                       ?>
+                                       <option value="korcam" >Korcam</option>
+                                       <option value="kordes" <?= ($_SESSION['role'] == 'korcam') ? 'selected' : '' ?> >Kordes</option>
+                                    </select>
+                                    </th>
+                                    <th>
+                                       <select class="form-control" id="filter-kecamatan" name="filter-kecamatan" <?= ($_SESSION['role'] != 'administrator' ) ? 'style="pointer-events: none;"' : ''; ?> > 
+                                          <option value="">Pilih Kecamatan</option>
+                                          <?php
+                                             foreach ($kecamatans as $kecamatan){
+                                                ?>
+                                                   <option value="<?php echo $kecamatan->id_kecamatan; ?>" <?= ($_SESSION['role'] != 'administrator'  && $_SESSION['id_kecamatan'] == $kecamatan->id_kecamatan) ? 'selected' : ''; ?> ><?php echo $kecamatan->nama_kecamatan; ?></option>
+
+                                                <?php
+                                             }
+                                          ?>
+                                       </select> 
+                                    </th>
+                                    <th>
+                                       <select class="form-control" id="filter-desa" name="filter-desa" <?= ($_SESSION['role'] == 'kordes' ) ? 'style="pointer-events: none;"' : ''; ?> > 
+                                          <option value="">Pilih Desa</option>
+                                       </select>
+                                    </th>
+                                    <th>
+                                       <button type="button" id="filter-button" onclick="getAllUser()" class="btn btn-primary">Filter</button>
+                                       <button type="button" id="reset-button" onclick="resetFilter()" class="btn btn-secondary">Reset</button>
+                                    </th>
+                                 </tr>
                                  <tr>
                                     <th>Username</th>
                                     <th>Password</th>
@@ -175,12 +218,19 @@ if($_SESSION['role'] == 'kordes'){
 
       <script>
          getAllUser();
+         getDesa();
 
          function getAllUser() {
             $.ajax({
                url: "ajax-user.php",
                type: "GET",
-               data: { func: 'getAllUser' },
+               data: { 
+                  func: 'getAllUser',
+                  username: $('#filter-username').val(),
+                  role: $('#filter-role').val(),
+                  kecamatan: $('#filter-kecamatan').val(),
+                  desa: $('#filter-desa').val(),    
+               },
                success: function(response) {
                      // Clear existing table rows
                      $('#user-list-table tbody').empty();
@@ -195,6 +245,27 @@ if($_SESSION['role'] == 'kordes'){
                      console.error("Error: " + error);
                }
             });
+         }
+
+         function resetFilter(){
+            $('#filter-username').val('');
+            <?php 
+               if($_SESSION['role'] == 'administrator'){
+                  ?>
+                  $('#filter-kecamatan').val('');
+                  $('#filter-role').val('');
+                  <?php
+               }
+            ?>
+            <?php 
+               if($_SESSION['role'] != 'kordes'){
+                  ?>
+                  $('#filter-desa').val('');
+                  <?php
+               }
+            ?>
+
+            getAllUser();
          }
 
          function createUserRow(userData) {
@@ -313,6 +384,42 @@ if($_SESSION['role'] == 'kordes'){
             }
          });
       }
+
+      $('#filter-kecamatan').change(function() {
+            getDesa();
+         });
+
+         function getDesa(){
+            var idKecamatan = $('#filter-kecamatan').val();
+
+            $.ajax({
+               url: 'ajax.php',
+               method: 'POST',
+               data: {
+                  func: 'getDesa',
+                  username: $('#username').val(),
+                  id_kecamatan: idKecamatan
+               },
+               success: function(response) {
+                  var data = response;
+                  var desaSelect = $('#filter-desa');
+
+                  // Clear previous options
+                  desaSelect.empty();
+                  desaSelect.append('<option value="">Pilih Desa</option>');
+
+                  // Populate new options
+                  data.listDesa.forEach(function(desa) {
+                        desaSelect.append('<option value="' + desa.id_desa + '">' + desa.nama_desa + '</option>');
+                  });
+
+                  // Set the current user's desa if it exists
+                  if (data.currentUserIdDesa !== null) {
+                        desaSelect.val(data.currentUserIdDesa);
+                  }
+               }
+            });
+         }
 
       </script>
 </body>

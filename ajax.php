@@ -574,7 +574,7 @@ function getDesa(){
     // Assuming getConn() returns a valid database connection
     $conn = getConn();
     
-    if(isset($_POST['username'])){
+    if(!empty($_POST['username'])){
         
         $username = $_POST['username'];
         // Prepare and execute the query to get user info
@@ -654,23 +654,61 @@ function getDesaVideo(){
     $conn->close();
 }
 
-function getDataDesa(){
+function getDataDesa() {
     $conn = getConn();
-    $idDesa = $_POST['id_desa'];
+
     $page = isset($_POST['page']) ? (int)$_POST['page'] : 1;
     $limit = 100; // Number of records per page
     $offset = ($page - 1) * $limit;
 
-    $sql = "SELECT COUNT(*) as count FROM videos WHERE id_desa = '$idDesa'";
-    $result = mysqli_query($conn, $sql);
-    $row = mysqli_fetch_assoc($result);
-    $totalRecords = $row['count'];
-    $totalPages = ceil($totalRecords / $limit);
+    // Base SQL query for counting total records
+    $countSql = "SELECT COUNT(*) as count FROM videos 
+                 LEFT JOIN kecamatan ON videos.id_kecamatan = kecamatan.id_kecamatan 
+                 LEFT JOIN desa ON videos.id_desa = desa.id_desa";
 
-    $sql = "SELECT id, nik, videos.created_at, kecamatan.nama_kecamatan, desa.nama_desa, video_name, extension FROM videos 
+    // Base SQL query for fetching data
+    $sql = "SELECT id, nik, videos.created_at, kecamatan.nama_kecamatan, desa.nama_desa, video_name, extension, upload_by FROM videos 
             LEFT JOIN kecamatan ON videos.id_kecamatan = kecamatan.id_kecamatan 
-            LEFT JOIN desa ON videos.id_desa = desa.id_desa 
-            WHERE videos.id_desa = '$idDesa' LIMIT $limit OFFSET $offset";
+            LEFT JOIN desa ON videos.id_desa = desa.id_desa";
+    
+    // Apply filters if they are set
+    $filters = [];
+    if (!empty($_POST['nik'])) {
+        $nik = mysqli_real_escape_string($conn, $_POST['nik']);
+        $filters[] = "videos.nik LIKE '%$nik%'";
+    }
+    if (!empty($_POST['id_kec'])) {
+        $id_kec = (int)$_POST['id_kec'];
+        $filters[] = "videos.id_kecamatan = $id_kec";
+    }
+    if (!empty($_POST['id_des'])) {
+        $id_des = (int)$_POST['id_des'];
+        $filters[] = "videos.id_desa = $id_des";
+    }
+    if (!empty($_POST['upload_date'])) {
+        $upload_date = mysqli_real_escape_string($conn, $_POST['upload_date']);
+        $filters[] = "DATE(videos.created_at) = '$upload_date'";
+    }
+    if (!empty($_POST['upload_by'])) {
+        $upload_by = mysqli_real_escape_string($conn, $_POST['upload_by']);
+        $filters[] = "videos.upload_by LIKE '%$upload_by%'";
+    }
+
+    // Append filters to the SQL query
+    if (!empty($filters)) {
+        $filterSql = " WHERE " . implode(" AND ", $filters);
+        $countSql .= $filterSql;
+        $sql .= $filterSql;
+    }
+
+    // Execute count query to get the total number of filtered records
+    $countResult = mysqli_query($conn, $countSql);
+    $countRow = mysqli_fetch_assoc($countResult);
+    $totalRecordFound = $countRow['count'];
+    $totalPages = ceil($totalRecordFound / $limit);
+
+    // Append limit and offset to the data fetching SQL query
+    $sql .= " LIMIT $limit OFFSET $offset";
 
     $result = mysqli_query($conn, $sql);
     $data = array();
@@ -681,13 +719,15 @@ function getDataDesa(){
 
     $response = array(
         'results' => $data,
-        'totalPages' => $totalPages
+        'totalPages' => $totalPages,
+        'totalRecordFound' => $totalRecordFound
     );
 
     echo json_encode($response);
 
     mysqli_close($conn);
 }
+
 
 function deleteVideo(){
     $response = [];
