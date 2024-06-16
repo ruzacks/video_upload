@@ -4,7 +4,7 @@
       <!-- Required meta tags -->
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-      <title>Sofbox - Responsive Bootstrap 4 Admin Dashboard Template</title>
+      <title>Video Upload</title>
       <!-- Favicon -->
       <link rel="shortcut icon" href="images/favicon.ico" />
       <!-- Bootstrap CSS -->
@@ -76,12 +76,12 @@
                             <a class="sign-in-logo mb-5" href="#"><img src="images/white-logo.png" class="img-fluid" alt="logo"></a>
                             <div class="owl-carousel" data-autoplay="true" data-loop="true" data-nav="false" data-dots="true" data-items="1" data-items-laptop="1" data-items-tab="1" data-items-mobile="1" data-items-mobile-sm="1" data-margin="0">
                                 <div class="item">
-                                    <h4 class="mb-1 text-white">Scan E-KTP</h4>
-                                    <p>Otomatis Ektraksi data E-KTP dari hasil foto Kamera</p>
+                                    <h4 class="mb-1 text-white">Upload Video</h4>
+                                    <p>Upload Video dari Gallery atau Kamera</p>
                                 </div>
                                 <div class="item">
-                                    <h4 class="mb-1 text-white">Save Data</h4>
-                                    <p>Data disimpan dan dapat diambil dalam bentuk report</p>
+                                    <h4 class="mb-1 text-white">Summary Video</h4>
+                                    <p>Video dikelompokan berdasarkan Kecamatan dan Desa</p>
                                 </div>
                                 <div class="item">
                                     <h4 class="mb-1 text-white">User Friendly</h4>
