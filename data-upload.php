@@ -375,6 +375,14 @@ const { createWorker } = FFmpeg;
                // formData.append('video', document.getElementById('video_input').files[0]);
                formData.append('video', document.getElementById('videoInput').files[0]);
 
+               Swal.fire({
+                  title: 'Uploading...',
+                  text: 'Please wait while the video is being uploaded.',
+                  allowOutsideClick: false,
+                  didOpen: () => {
+                     Swal.showLoading();
+                  }
+               });
                
                 $.ajax({
                     url: 'upload.php', // Endpoint to send the form data
