@@ -42,6 +42,8 @@ if (isset($_GET['func']) || isset($_POST['func'])) {
         getDesaVideo();
     } else if ($functionName === 'getDataDesa') {
         getDataDesa();
+    } else if ($functionName === 'deleteVideo') {
+        deleteVideo();
     } else {
         // Handle the case where the function name is not recognized
         header('Content-Type: application/json');
@@ -665,7 +667,7 @@ function getDataDesa(){
     $totalRecords = $row['count'];
     $totalPages = ceil($totalRecords / $limit);
 
-    $sql = "SELECT nik, videos.created_at, kecamatan.nama_kecamatan, desa.nama_desa, video_name, extension FROM videos 
+    $sql = "SELECT id, nik, videos.created_at, kecamatan.nama_kecamatan, desa.nama_desa, video_name, extension FROM videos 
             LEFT JOIN kecamatan ON videos.id_kecamatan = kecamatan.id_kecamatan 
             LEFT JOIN desa ON videos.id_desa = desa.id_desa 
             WHERE videos.id_desa = '$idDesa' LIMIT $limit OFFSET $offset";
@@ -685,6 +687,54 @@ function getDataDesa(){
     echo json_encode($response);
 
     mysqli_close($conn);
+}
+
+function deleteVideo(){
+    $response = [];
+    if($_SESSION['role'] == 'korcam' || $_SESSION['role'] == 'kordes'){
+        $response['status'] = "error";
+        $response['message'] = "You don't have previlege to delete!";
+
+        header('Content-Type: application/json');
+        echo json_encode($response);
+        exit();
+    }
+
+
+    $conn = getConn();
+    if ($conn === false) {
+        echo json_encode([
+            'status' => 'error',
+            'message' => 'Database connection failed'
+        ]);
+        return;
+    }
+
+    
+    $nik = $_POST['id'];
+    $video = $_POST['id_video'];
+   
+    $sqlDelete = "DELETE from videos WHERE nik = '$nik'";
+    $result = $conn->query($sqlDelete);
+
+    
+    if ($result) {
+        $filePath = '/home/verb4874/public_html/videos/'.$video;
+        if (file_exists($filePath)) {
+            unlink($filePath);
+        } else {
+            echo 'file not found';
+            exit();
+        }
+        $response['status'] = "success";
+        $response['message'] = "Data Deleted";
+    } else {
+        $response['status'] = "error";
+        $response['message'] = "Failed to delete";
+    }
+    
+    header('Content-Type: application/json');
+    echo json_encode($response);
 }
 
 

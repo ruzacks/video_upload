@@ -44,7 +44,7 @@
                         <th scope="col">Nama Kecamatan</th>
                         <th scope="col">Nama Desa</th>
                         <th scope="col">Video</th>
-                        
+                        <th scope="col">Action</th>
                     </tr>
                     </thead>
                     <tbody>

@@ -193,6 +193,7 @@ mysqli_close($conn);
       <script src="js/chart-custom.js"></script>
       <!-- Custom JavaScript -->
       <script src="js/custom.js"></script>
+      <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
 
       <script>
 
@@ -244,6 +245,69 @@ mysqli_close($conn);
                         };
                         tdVideo.appendChild(playButton);
                         tr.appendChild(tdVideo);
+
+                        const tdAction = document.createElement('td');
+
+                        //td action
+                        const editButton = document.createElement('a');
+                        editButton.textContent = 'Edit';
+                        editButton.href = `edit-upload.php?id=${item.id}`;
+                        editButton.className = 'btn btn-warning';
+                        tdAction.appendChild(editButton);
+
+                        const deleteButton = document.createElement('button');
+                        deleteButton.textContent = 'Delete';
+                        deleteButton.className = 'btn btn-danger';
+                        deleteButton.onclick = function() {
+                           Swal.fire({
+                              title: 'Are you sure?',
+                              text: "You won't be able to revert this!",
+                              icon: 'warning',
+                              showCancelButton: true,
+                              confirmButtonColor: '#3085d6',
+                              cancelButtonColor: '#d33',
+                              confirmButtonText: 'Yes, delete it!'
+                           }).then((result) => {
+                              if (result.isConfirmed) {
+                                    $.ajax({
+                                       url: 'ajax.php',
+                                       method: 'POST',
+                                       data: {
+                                          func: 'deleteVideo',
+                                          id: item.nik,
+                                          id_video: `${item.video_name}.${item.extension}`
+                                       },
+                                       beforeSend: function() {
+                                          Swal.fire({
+                                                title: 'Deleting...',
+                                                text: 'Please wait while the video is being deleted.',
+                                                icon: 'info',
+                                                allowOutsideClick: false,
+                                                showConfirmButton: false
+                                          });
+                                       },
+                                       success: function(response) {
+                                          if (response.status == "success") {
+                                                Swal.fire(
+                                                   'Deleted!',
+                                                   'The video has been deleted.',
+                                                   'success'
+                                                );
+                                                tr.remove();
+                                          } else {
+                                                Swal.fire(
+                                                   'Error!',
+                                                   response.message,
+                                                   'error'
+                                                );
+                                          }
+                                       }
+                                    });
+                              }
+                           });
+                        };
+                        tdAction.appendChild(deleteButton);
+                        tr.appendChild(tdAction);
 
                         tbody.appendChild(tr);
                      });
