@@ -345,7 +345,7 @@ mysqli_close($conn);
 
       <script>
          getDesa();
-         getDataDesa();
+         
 
          function resetFilter(){
             $('#filter-nik').val('');
@@ -579,6 +579,7 @@ mysqli_close($conn);
                   if (data.currentUserIdDesa !== null) {
                         desaSelect.val(data.currentUserIdDesa);
                   }
+                  getDataDesa();
                }
             });
          }
