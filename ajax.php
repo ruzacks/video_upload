@@ -693,14 +693,18 @@ function getDataDesa() {
         $upload_by = mysqli_real_escape_string($conn, $_POST['upload_by']);
         $filters[] = "videos.upload_by LIKE '%$upload_by%'";
     }
-
+    
     // Append filters to the SQL query
     if (!empty($filters)) {
         $filterSql = " WHERE " . implode(" AND ", $filters);
         $countSql .= $filterSql;
         $sql .= $filterSql;
     }
-
+    
+    if($_SESSION['role'] == 'kordes' || $_SESSION['role'] == 'kordes'){
+        $uploadBy = $_SESSION['username'];
+        $sql .= " OR videos.upload_by = '$uploadBy'";
+    }
     // Execute count query to get the total number of filtered records
     $countResult = mysqli_query($conn, $countSql);
     $countRow = mysqli_fetch_assoc($countResult);
