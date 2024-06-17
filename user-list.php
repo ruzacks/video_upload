@@ -325,11 +325,19 @@ if($_SESSION['role'] == 'kordes'){
             row.appendChild(roleCell);
 
             var kecamatanCell = document.createElement('td');
-            kecamatanCell.textContent = userData.kecamatan;
+            if(userData.role == 'administrator'){
+               kecamatanCell.textContent = '-';
+            } else {
+               kecamatanCell.textContent = userData.kecamatan;
+            }
             row.appendChild(kecamatanCell);
 
             var desaCell = document.createElement('td');
-            desaCell.textContent = userData.desa;
+            if(userData.role == 'kordes'){
+               desaCell.textContent = userData.desa;
+            } else {
+               desaCell.textContent = '-';
+            }
             row.appendChild(desaCell);
                         
             var actionCell = document.createElement('td');
