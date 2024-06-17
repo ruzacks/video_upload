@@ -110,6 +110,15 @@ function addUser(){
     $no_wa = mysqli_real_escape_string($conn, $_POST['no_wa']);
     $pass = mysqli_real_escape_string($conn, $_POST['password']);
 
+    if($role == 'administrator'){
+        $kecamatan = null;
+        $desa = null;
+    }
+
+    if($role == 'korcam' || $role == 'koordinator'){
+        $desa = null;
+    }
+
     // Check if the username already exists
     $check_username_sql = "SELECT COUNT(*) as count FROM users WHERE username = '$username'";
     $check_username_result = mysqli_query($conn, $check_username_sql);
@@ -180,12 +189,20 @@ function editUser(){
 
     if(!empty($_POST['kecamatan'])){
         $kecamatan = mysqli_real_escape_string($conn, $_POST['kecamatan']);
-        $setValue .= "id_kecamatan = '$kecamatan', ";
+        if($_POST['role'] == 'administrator'){
+            $setValue .= "id_kecamatan = NULL, ";
+        } else {
+            $setValue .= "id_kecamatan = '$kecamatan', ";
+        }   
     } 
 
     if(!empty($_POST['desa'])){
         $desa = mysqli_real_escape_string($conn, $_POST['desa']);
-        $setValue .= "id_desa = '$desa', ";
+        if($_POST['role'] != 'kordes'){
+            $setValue .= "id_desa = NULL, ";
+        } else {
+            $setValue .= "id_desa = '$desa', ";
+        }
     }
 
     if(!empty($_POST['nama'])){
