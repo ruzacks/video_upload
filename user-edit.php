@@ -5,7 +5,7 @@
 <?php
   $conn = getConn();
   $username = mysqli_escape_string($conn, $_GET['username']);
-  $sql = "SELECT username, role, id_kecamatan, id_desa FROM users WHERE username='$username'";
+  $sql = "SELECT username, role, id_kecamatan, id_desa, nama, no_wa FROM users WHERE username='$username'";
   $result = mysqli_query($conn, $sql);
 
   $user = mysqli_fetch_object($result);
@@ -151,6 +151,14 @@
                                              <label for="username">Username</label>
                                              <input type="text" class="form-control" id="username" name="username" readonly value="<?php echo $user->username; ?>">
                                        </div>
+                                       <div class="form-group col-sm-6">
+                                             <label for="nama">Nama</label>
+                                             <input type="text" class="form-control" id="nama" name="nama" value="<?= $user->nama ?>" required >
+                                       </div>
+                                       <div class="form-group col-sm-6">
+                                             <label for="no_wa">No Whatsapp</label>
+                                             <input type="tel" class="form-control" id="no_wa" name="no_wa" inputmode="numeric" pattern="[0-9]*" value="<?= $user->no_wa ?>" required >
+                                       </div>
                                        <div class="form-group col-sm-6" <?php echo $editor->role == 'kordes' ? 'hidden' : ''?>>
                                              <label for="role">Role</label>
                                              <select class="form-control" id="role" name="role" required <?php if ($editor->role == 'korcam') { ?> style="pointer-events: none;" <?php } ?> >
@@ -285,6 +293,11 @@
 
 
       <script>
+
+         document.getElementById('no_wa').addEventListener('input', function (e) {
+            this.value = this.value.replace(/[^0-9]/g, '');
+         });
+
          $(document).ready(function() {
             getDesa();
             setUserAttribute();
@@ -336,19 +349,27 @@
             switch ($('#role').val()) {
                   case 'administrator':
                      $('#kecamatan_input').hide();
+                     $('#kecamatan').prop('required', false);
                      $('#desa_input').hide();
+                     $('#desa').prop('required', false);
                      break;
                   case 'koordinator':
                      $('#kecamatan_input').show();
+                     $('#kecamatan').prop('required', true);
                      $('#desa_input').hide();
+                     $('#desa').prop('required', false);
                      break;
                   case 'korcam':
                      $('#kecamatan_input').show();
+                     $('#kecamatan').prop('required', true);
                      $('#desa_input').hide();
+                     $('#desa').prop('required', false)
                      break;
                   case 'kordes':
                      $('#kecamatan_input').show();
+                     $('#kecamatan').prop('required', true);
                      $('#desa_input').show();
+                     $('#desa').prop('required', true)
                      break;
                   default:
                      $('#kecamatan_input').hide();

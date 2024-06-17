@@ -39,7 +39,9 @@ function getAllUser(){
     $sql = "SELECT 
             username, 
             password, 
-            role, 
+            role,
+            nama,
+            no_wa, 
             kecamatan.nama_kecamatan AS kecamatan, 
             desa.nama_desa AS desa
         FROM 
@@ -91,7 +93,7 @@ function addUser(){
     // Assuming you're handling POST data securely, like through validation and sanitization
     $conn = getConn();
 
-    if(empty($_POST['username']) || empty($_POST['password']) || empty($_POST['role'])) {
+    if(empty($_POST['username']) || empty($_POST['nama']) || empty($_POST['no_wa']) || empty($_POST['password']) || empty($_POST['role'])) {
         header("Location: {$_SERVER['HTTP_REFERER']}?error=Please fill in all required fields.");
         exit();
     }
@@ -104,6 +106,8 @@ function addUser(){
     $desa = isset($_POST['desa']) ? mysqli_real_escape_string($conn, $_POST['desa']) : null;
 
     $role = mysqli_real_escape_string($conn, $_POST['role']);
+    $nama = mysqli_real_escape_string($conn, $_POST['nama']);
+    $no_wa = mysqli_real_escape_string($conn, $_POST['no_wa']);
     $pass = mysqli_real_escape_string($conn, $_POST['password']);
 
     // Check if the username already exists
@@ -119,7 +123,7 @@ function addUser(){
     }
 
     // Prepare the SQL query with placeholders for prepared statements
-    $sql = "INSERT INTO users (username, password, id_kecamatan, id_desa, role) VALUES (?, ?, ?, ?, ?)";
+    $sql = "INSERT INTO users (username, password, id_kecamatan, id_desa, role, nama, no_wa) VALUES (?, ?, ?, ?, ?, ?, ?)";
 
 
     $stmt = $conn->prepare($sql);
@@ -132,7 +136,7 @@ function addUser(){
 
     // Bind parameters
     // Use `s` for string and `i` for integer
-    $stmt->bind_param("sssss", $username, $pass, $kecamatanParam, $desaParam, $role);
+    $stmt->bind_param("sssssss", $username, $pass, $kecamatanParam, $desaParam, $role, $nama, $no_wa);
 
     // Set the parameters, converting empty values to NULL
     $kecamatanParam = !empty($kecamatan) ? $kecamatan : null;
@@ -157,7 +161,7 @@ function editUser(){
     // Assuming you're handling POST data securely, like through validation and sanitization
     $conn = getConn();
 
-    if(empty($_POST['username']) || empty($_POST['role'])) {
+    if(empty($_POST['username']) || empty($_POST['role']) || empty($_POST['nama']) || empty($_POST['no_wa']) ) {
         header("Location: {$_SERVER['HTTP_REFERER']}?error=Please fill in all required fields.");
         exit();
     }
@@ -174,14 +178,24 @@ function editUser(){
     // Fetch POST data
     $username = mysqli_real_escape_string($conn, $_POST['username']);
 
-    if(isset($_POST['kecamatan'])){
+    if(!empty($_POST['kecamatan'])){
         $kecamatan = mysqli_real_escape_string($conn, $_POST['kecamatan']);
         $setValue .= "id_kecamatan = '$kecamatan', ";
     } 
 
-    if(isset($_POST['desa'])){
+    if(!empty($_POST['desa'])){
         $desa = mysqli_real_escape_string($conn, $_POST['desa']);
         $setValue .= "id_desa = '$desa', ";
+    }
+
+    if(!empty($_POST['nama'])){
+        $nama = mysqli_real_escape_string($conn, $_POST['nama']);
+        $setValue .= "nama = '$nama', ";
+    }
+
+    if(!empty($_POST['no_wa'])){
+        $no_wa = mysqli_real_escape_string($conn, $_POST['no_wa']);
+        $setValue .= "no_wa = '$no_wa', ";
     }
 
     $role = mysqli_real_escape_string($conn, $_POST['role']);

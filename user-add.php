@@ -83,6 +83,14 @@
                                     <input type="text" class="form-control" id="username" name="username" required >
                               </div>
                               <div class="form-group col-sm-6">
+                                    <label for="nama">Nama</label>
+                                    <input type="text" class="form-control" id="nama" name="nama" required >
+                              </div>
+                              <div class="form-group col-sm-6">
+                                    <label for="no_wa">No Whatsapp</label>
+                                    <input type="tel" class="form-control" id="no_wa" name="no_wa" inputmode="numeric" pattern="[0-9]*" required >
+                              </div>
+                              <div class="form-group col-sm-6">
                                     <label for="password">Password</label>
                                     <input type="password" class="form-control" id="password" name="password" required>
                               </div>
@@ -187,6 +195,11 @@
       <!-- Custom JavaScript -->
       <script src="js/custom.js"></script>
       <script>
+         
+         document.getElementById('no_wa').addEventListener('input', function (e) {
+            this.value = this.value.replace(/[^0-9]/g, '');
+         });
+
          $(document).ready(function() {
             getDesa();
             setUserAttribute();

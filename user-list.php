@@ -66,6 +66,14 @@ if($_SESSION['role'] == 'kordes'){
                         </div>
                      </div>
                      <div class="iq-card-body">
+                     <?php $error = isset($_GET['error']) ? $_GET['error'] : ''; ?>
+                     <div class="alert alert-danger" role="alert" <?php echo empty($error) ? 'hidden' : ''; ?>>
+                        <div class="iq-alert-text"><?php echo $error; ?></div>
+                     </div>
+                     <?php $succeed = isset($_GET['success']) ? $_GET['success'] : ''; ?>
+                     <div class="alert alert-success" role="alert" <?php echo empty($succeed) ? 'hidden' : ''; ?>>
+                        <div class="iq-alert-text"><?php echo $succeed; ?></div>
+                     </div>
                         <div class="table-responsive">
                            <table id="user-list-table" class="table table-striped table-bordered mt-4" role="grid" aria-describedby="user-list-page-info">
                              <thead>
@@ -180,6 +188,29 @@ if($_SESSION['role'] == 'kordes'){
          </div>
       </footer>
       <!-- Footer END -->
+
+      <!-- Modal -->
+      <div class="modal fade" id="userModal" tabindex="-1" role="dialog" aria-labelledby="userModalLabel" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+         <div class="modal-content">
+            <div class="modal-header">
+            <h5 class="modal-title" id="userModalLabel">User Information</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+               <span aria-hidden="true">&times;</span>
+            </button>
+            </div>
+            <div class="modal-body">
+            <p id="modalNama"></p>
+            <p id="modalNoWa"></p>
+            </div>
+            <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+         </div>
+      </div>
+      </div>
+
+
     <!-- Optional JavaScript -->
       <!-- jQuery first, then Popper.js, then Bootstrap JS -->
       <script src="js/jquery.min.js"></script>
@@ -272,7 +303,17 @@ if($_SESSION['role'] == 'kordes'){
             var row = document.createElement('tr');
             
             var usernameCell = document.createElement('td');
-            usernameCell.textContent = userData.username;
+            var usernameLink = document.createElement('a');
+            usernameLink.href = '#';
+            usernameLink.textContent = userData.username;
+            usernameLink.setAttribute('data-toggle', 'modal');
+            usernameLink.setAttribute('data-target', '#userModal');
+            usernameLink.addEventListener('click', function() {
+               document.getElementById('modalNama').textContent = 'Name: ' + userData.nama;
+               document.getElementById('modalNoWa').textContent = 'WhatsApp: ' + userData.no_wa;
+            });
+            
+            usernameCell.appendChild(usernameLink);
             row.appendChild(usernameCell);
 
             var passwordCell = document.createElement('td');
