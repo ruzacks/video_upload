@@ -237,19 +237,25 @@
             switch ($('#role').val()) {
                   case 'administrator':
                      $('#kecamatan_input').hide();
+                     $('#kecamatan').prop('required', false);
                      $('#desa_input').hide();
+                     $('#desa').prop('required', false);
                      break;
                   case 'koordinator':
                      $('#kecamatan_input').show();
+                     $('#kecamatan').prop('required', true);
                      $('#desa_input').hide();
+                     $('#desa').prop('required', false);
                      break;
                   case 'korcam':
                      $('#kecamatan_input').show();
+                     $('#kecamatan').prop('required', true);
                      $('#desa_input').hide();
                      $('#desa').prop('required', false)
                      break;
                   case 'kordes':
                      $('#kecamatan_input').show();
+                     $('#kecamatan').prop('required', true);
                      $('#desa_input').show();
                      $('#desa').prop('required', true)
                      break;
