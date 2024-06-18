@@ -334,40 +334,51 @@
             formData.append('video', document.getElementById('videoInput').files[0]);
 
             Swal.fire({
-               title: 'Uploading...',
-               text: 'Please wait while the video is being uploaded.',
-               allowOutsideClick: false,
-               didOpen: () => {
-                  Swal.showLoading();
-               }
+                title: 'Uploading...',
+                html: '<div id="progress-container"><progress id="progress-bar" value="0" max="100"></progress></div><div id="upload-status">0%</div>',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+
+                    $.ajax({
+                        url: 'upload.php', // Endpoint to send the form data
+                        type: 'POST',
+                        data: formData,
+                        contentType: false, // Required for FormData
+                        processData: false, // Required for FormData
+                        xhr: function() {
+                            const xhr = new window.XMLHttpRequest();
+                            xhr.upload.addEventListener('progress', function(evt) {
+                                if (evt.lengthComputable) {
+                                    const percentComplete = Math.round((evt.loaded / evt.total) * 100);
+                                    document.getElementById('progress-bar').value = percentComplete;
+                                    document.getElementById('upload-status').textContent = `${percentComplete}%`;
+                                }
+                            }, false);
+                            return xhr;
+                        },
+                        success: function(response) {
+                            Swal.close();
+                            Swal.fire({
+                                icon: response.status,
+                                title: response.message,
+                                timer: 1500
+                            });
+                            if(response.status === "success"){
+                                resetForm();
+                            }
+                        },
+                        error: function(xhr, status, error) {
+                            Swal.close();
+                            Swal.fire({
+                                icon: "error",
+                                title: xhr.responseJSON.message || 'Upload failed',
+                                // timer: 1000
+                            });
+                        }
+                    });
+                }
             });
-            
-               $.ajax({
-                  url: 'upload.php', // Endpoint to send the form data
-                  type: 'POST',
-                  data: formData,
-                  contentType: false, // Required for FormData
-                  processData: false, // Required for FormData
-                  success: function(response) {
-                     // Handle success response
-                     Swal.fire({
-                        icon: response.status,
-                        title: response.message,
-                        timer: 1500
-                     });
-                     if(response.status == "success"){
-                        resetForm();
-                     }
-                  },
-                  error: function(xhr, status, error) {
-                     // Handle error response
-                     Swal.fire({
-                        icon: "error",
-                        title: response.message,
-                        // timer: 1000
-                     });
-                  }
-               });
          });       
 
 
