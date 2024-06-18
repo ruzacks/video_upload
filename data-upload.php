@@ -67,7 +67,7 @@
         #videoElement {
             width: 100%;
             height: auto;
-            max-height: 70vh; /* Adjust as needed */
+            max-height: 60vh; /* Adjust as needed */
             margin-bottom: 10px;
         }
         /* Button styles */
