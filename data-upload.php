@@ -81,6 +81,10 @@
             font-size: 16px;
             cursor: pointer;
         }
+        #timer {
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
     </style>
    </head>
    <body>
@@ -168,7 +172,7 @@
                      <div class="iq-card-body">
                         <div class="row mt-4">
                            <div class="col-lg-12 col-md-6 text-center canvas-container">
-                              <p class="iq-bg-secondary pt-5 pb-5 text-center rounded font-size-18" id="frame-template" onclick="document.getElementById('videoInput').click();" style="cursor:pointer">Take A Video</p>
+                              <p class="iq-bg-secondary pt-5 pb-5 text-center rounded font-size-18" id="frame-template" style="cursor:pointer">Please add Video</p>
                               <video id="videoPlayer" style="display: none; width: 100%; height: auto;" controls></video>
                               <small id="videoError" class="text-danger" style="display:none;">Please select a valid video.</small>
                            </div>
@@ -220,6 +224,7 @@
             <div class="modal-content">
                   <span class="close" id="closeModal" onclick="closeModal('videoModal')">&times;</span>
                   <video id="videoElement" autoplay></video>
+                  <div id="timer">00:00</div> <!-- Timer display -->
                   <div id="controls" class="row">
                      <div class="col-sm-6 d-flex justify-content-center">
                         <button class="btn btn-primary" id="startButton" onclick="startRecording()">Start</button>
@@ -285,6 +290,9 @@
             },
             audio: true
          };
+
+         let timerInterval;
+         let seconds = 0;
 
          //RESET FORM
          $('#resetButton').on('click', function() {
@@ -434,6 +442,22 @@
 
          document.getElementById('videoInput').addEventListener('change', handleVideoFile);
 
+         function startTimer() {
+            const timerElement = document.getElementById('timer');
+            timerInterval = setInterval(() => {
+               seconds++;
+               const minutes = Math.floor(seconds / 60);
+               const remainingSeconds = seconds % 60;
+               timerElement.textContent = `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
+            }, 1000);
+         }
+
+         function stopTimer() {
+            clearInterval(timerInterval);
+            seconds = 0;
+            document.getElementById('timer').textContent = '00:00';
+         }
+
          async function startRecording() {
             try {
                stream = await navigator.mediaDevices.getUserMedia(constraints);
@@ -460,9 +484,11 @@
                      const dataTransfer = new DataTransfer();
                      dataTransfer.items.add(file);
                      document.getElementById('videoInput').files = dataTransfer.files;
+                     stopTimer();
                };
 
                mediaRecorder.start();
+               startTimer();
                document.getElementById('startButton').disabled = true;
                document.getElementById('stopButton').disabled = false;
 
@@ -477,6 +503,7 @@
             document.getElementById('startButton').disabled = false;
             document.getElementById('stopButton').disabled = true;
             document.getElementById('videoModal').style.display = 'none';
+            document.getElementById('frame-template').style.display = 'none';
          }
 
          async function switchCamera() {
@@ -510,6 +537,7 @@
                videoPlayer.src = URL.createObjectURL(file);
                videoPlayer.controls = true;
                document.getElementById('videoError').style.display = 'none';
+               document.getElementById('frame-template').style.display = 'none';
             } else {
                videoPlayer.style.display = 'none';
                document.getElementById('videoError').style.display = 'block';
