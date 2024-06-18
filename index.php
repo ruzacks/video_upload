@@ -297,8 +297,8 @@ mysqli_close($conn);
                            <span aria-hidden="true">&times;</span>
                      </button>
                   </div>
-                  <div class="modal-body">
-                     <video id="videoPlayer" width="100%" controls>
+                  <div class="modal-body justify-content-center" style="justify-content: center;">
+                     <video id="videoPlayer" height="480px" width="765px" controls>
                            <source src="" type="video/mp4">
                            Your browser does not support the video tag.
                      </video>
