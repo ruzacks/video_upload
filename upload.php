@@ -49,7 +49,7 @@ if (isset($_FILES['video']) && $_FILES['video']['error'] === UPLOAD_ERR_OK) {
     $newFileName = $nik . '.' . $fileExtension;
 
     // Check if the file is a video
-    $allowedfileExtensions = array('mp4', 'avi', 'mov', 'mkv');
+    $allowedfileExtensions = array('mp4', 'avi', 'mov', 'mkv', 'webm');
     if (in_array($fileExtension, $allowedfileExtensions)) {
         // Directory to save the uploaded video file
         // Ensure the directory path ends with a slash or backslash
