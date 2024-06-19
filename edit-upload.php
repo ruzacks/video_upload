@@ -509,12 +509,10 @@ $conn->close();
                   if (!found) {
                      $('#nik').css('border', '2px solid red');
                      $('#nik-error').show();
-                     $('#kecamatan').css('pointer-events', '');
                      $('#kecamatan').val('').trigger('change');
                   } else {
                      $('#nik').css('border', '');
                      $('#nik-error').hide();
-                     $('#kecamatan').css('pointer-events', 'none');
                   }
                } else if (nikValue.length < minLength) {
                   $('#kecamatan').val('').trigger('change');
