@@ -18,7 +18,7 @@
                      <li class="iq-menu-title"><i class="ri-separator"></i><span>Main</span></li>
                      <li class="<?php echo (strpos($_SERVER['PHP_SELF'], 'index.php') !== false ? 'active' : ''); ?>"><a href="index.php" class="iq-waves-effect"><i class="ri-home-4-line"></i><span>Dashboard</span></a></li>
                            
-                     <?php if ($_SESSION['role'] != 'kordes') { ?>
+                     <?php if ($_SESSION['role'] != 'kordes' && strpos($_SESSION['username'],'kpu') === false) { ?>
                         <li class="<?php echo (strpos($_SERVER['PHP_SELF'], 'user') !== false ? 'active' : ''); ?>">
                            <a href="#user-info" class="iq-waves-effect collapsed"  data-toggle="collapse" aria-expanded="false"><i class="ri-user-line"></i><span>User</span><i class="ri-arrow-right-s-line iq-arrow-right"></i></a>
                            <ul id="user-info" class="iq-submenu collapse" data-parent="#iq-sidebar-toggle">

@@ -427,9 +427,11 @@ mysqli_close($conn);
                         tdVideo.appendChild(playButton);
                         tr.appendChild(tdVideo);
 
-                        const tdAction = document.createElement('td');
-
+                        
                         //td action
+                        <?php if (strpos($_SESSION['username'],'kpu') === false) { ?>
+                           
+                        const tdAction = document.createElement('td');
                         const editButton = document.createElement('a');
                         editButton.textContent = 'Edit';
                         editButton.href = `edit-upload.php?id=${item.id}`;
@@ -490,6 +492,7 @@ mysqli_close($conn);
                         };
                         tdAction.appendChild(deleteButton);
                         tr.appendChild(tdAction);
+                        <?php } ?>
 
                         tbody.appendChild(tr);
                      });
