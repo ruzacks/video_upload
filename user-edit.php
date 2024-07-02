@@ -168,6 +168,7 @@
                                                 ?>
                                                    <option value="administrator" <?= ($user->role == 'administrator') ? 'selected' : ''; ?>>Administrator</option>
                                                    <option value="koordinator" <?= ($user->role == 'koordinator') ? 'selected' : ''; ?>>Koordinator</option>
+                                                <option value="verifikator" <?= ($user->role == 'verifikator') ? 'selected' : ''; ?>>Verifikator</option>
                                                 <?php 
                                                    } 
                                                 ?>

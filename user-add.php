@@ -104,6 +104,7 @@
                                        ?>
                                           <option value="administrator">Administrator</option>
                                           <option value="koordinator">Koordinator</option>
+                                          <option value="verifikator">Verifikator</option>
                                        <?php 
                                           } 
                                        ?>
