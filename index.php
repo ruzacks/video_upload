@@ -417,7 +417,7 @@ mysqli_close($conn);
                         const tdVideo = document.createElement('td');
 
                         const playButton = document.createElement('button');
-                        playButton.textContent = 'Play Video';
+                        playButton.textContent = 'Play';
                         playButton.className = 'btn btn-primary';
                         playButton.onclick = function() {
                            const videoSrc = `videos/${item.video_name}.${item.extension}`;
@@ -429,8 +429,8 @@ mysqli_close($conn);
 
                         <?php if($_SESSION['role'] == 'administrator') { ?>
                         const downloadButton = document.createElement('button');
-                        downloadButton.textContent = 'download';
-                        downloadButton.className = 'btn btn-success mx-2';
+                        downloadButton.textContent = 'Download';
+                        downloadButton.className = 'btn btn-success mx-1';
                         downloadButton.onclick = function() {
                            const videoSrc = `videos/${item.video_name}.${item.extension}`;
                            const link = document.createElement('a');
