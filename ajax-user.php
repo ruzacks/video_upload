@@ -27,6 +27,8 @@ if (isset($_GET['func']) || isset($_POST['func'])) {
         changePassword();
     } else if ($functionName === 'changeUserStatus') {
         changeUserStatus();
+    } else if ($functionName === 'loginUser') {
+        loginUser();
     }
 }
 
@@ -333,6 +335,35 @@ function isAdmin(){
     if($_SESSION['role'] != 'administrator'){
         return false;
     }
+}
+
+function loginUser(){
+    $loginStat = $_POST['login_user'];
+
+    $loginStat == 1 ? $response['message'] = 'Semua User dapat Login' : $response['message'] = 'Hanya Administrator dan user KPU yang dapat Login';
+
+    $conn = getConn();
+
+    // Prepare and execute the update query
+    $query = "UPDATE lookups SET login_user = ?";
+    $stmt = mysqli_prepare($conn, $query);
+    mysqli_stmt_bind_param($stmt, 'i', $loginStat);
+
+    if (mysqli_stmt_execute($stmt)) {
+        $response['status'] = 'success';
+        
+    } else {
+        $response['status'] = 'error';
+        $response['message'] = 'Query failed: ' . mysqli_error($conn);
+    }
+
+    // Close the statement and connection
+    mysqli_stmt_close($stmt);
+    mysqli_close($conn);
+
+    // header('Content-Type: application/json');
+    echo json_encode($response);
+
 }
 
 ?>

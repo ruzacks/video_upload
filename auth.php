@@ -16,9 +16,6 @@ if (isset($_GET['func']) || isset($_POST['func'])) {
 }
 
 function login(){
-    $username = $_POST['username'];
-    $password = $_POST['password'];
-
     $conn = getConn();
     if ($conn === false) {
         echo json_encode([
@@ -27,6 +24,9 @@ function login(){
         ]);
         return;
     }
+    
+    $username = $_POST['username'];
+    $password = $_POST['password'];
 
     // Query to fetch the user with the given username
     $query = "SELECT * FROM users WHERE username = ?";
@@ -37,19 +37,39 @@ function login(){
     $user = $result->fetch_assoc();
 
     if ($user && ($password == $user['password'])) {
-        // Password is correct, create session or perform necessary actions
+        // Password is correct, check user role or username restriction
 
+        $query = "SELECT login_user FROM lookups";
+        $result = mysqli_query($conn, $query);
+
+        if ($result) {
+            $row = mysqli_fetch_assoc($result);
+            if ($row) {
+                // Fetch the value from the associative array
+                $login_user = $row['login_user'];
+                // Check if the user's role is 'administrator' or if the username contains 'kpu'
+                if ($login_user == 0 && !($user['role'] == 'administrator' || stripos($user['username'], 'kpu') !== false)) {
+                    echo json_encode([
+                        'status' => 'error',
+                        'message' => 'Login sedang dibatasi'
+                    ]);
+                    return; // Break the function execution if the condition is met
+                }
+            }
+        }
+
+        // Start session and store user data
         session_start();
         $_SESSION['user_id'] = $user['id'];
         $_SESSION['username'] = $user['username'];
         $_SESSION['role'] = $user['role'];
         $_SESSION['id_kecamatan'] = $user['id_kecamatan'];
         $_SESSION['id_desa'] = $user['id_desa'];
+
         echo json_encode([
             'status' => 'success',
             'message' => 'Login successful'
         ]);
-       
     } else {
         // Invalid credentials
         echo json_encode([
@@ -61,5 +81,6 @@ function login(){
     $stmt->close();
     $conn->close();
 }
+
 
 ?>

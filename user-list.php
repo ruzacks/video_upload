@@ -7,6 +7,19 @@ if($_SESSION['role'] == 'kordes'){
    exit();
 }
 
+$conn = getConn();
+
+$query = "SELECT login_user FROM lookups";
+$result = mysqli_query($conn, $query);
+
+if ($result) {
+   $row = mysqli_fetch_assoc($result);
+   if ($row) {
+       // Fetch the value from the associative array
+       $login_user = $row['login_user'];
+   }
+}
+
 ?>
 
 
@@ -63,6 +76,11 @@ if($_SESSION['role'] == 'kordes'){
                      <div class="iq-card-header d-flex justify-content-between">
                         <div class="iq-header-title">
                            <h4 class="card-title">User List</h4>
+                           <label>
+                              <input type="checkbox" id="loginUserCheckbox" <?= ($login_user == 1) ? 'checked' : '' ?> > Login Semua User
+                           </label>
+
+
                         </div>
                      </div>
                      <div class="iq-card-body">
@@ -248,6 +266,40 @@ if($_SESSION['role'] == 'kordes'){
 
 
       <script>
+
+         $(document).ready(function(){
+            $('#loginUserCheckbox').change(function(){
+                var isChecked = $(this).is(':checked');
+                var loginUser = isChecked ? 1 : 0;
+
+                $.ajax({
+                    url: 'ajax-user.php',
+                    type: 'POST',
+                    data: {
+                        func: 'loginUser',
+                        login_user: loginUser
+                    },
+                    success: function(response) {
+                        var res = JSON.parse(response);
+                        Swal.fire({
+                            title: res.status === 'success' ? 'Success' : 'Error',
+                            text: res.message,
+                            icon: res.status === 'success' ? 'success' : 'error',
+                            confirmButtonText: 'OK'
+                        });
+                    },
+                    error: function(jqXHR, textStatus, errorThrown) {
+                        Swal.fire({
+                            title: 'Error',
+                            text: 'An error occurred: ' + textStatus,
+                            icon: 'error',
+                            confirmButtonText: 'OK'
+                        });
+                    }
+                });
+            });
+        });
+
          getAllUser();
          getDesa();
 
