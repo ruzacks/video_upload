@@ -415,6 +415,7 @@ mysqli_close($conn);
                         tr.appendChild(tdUploadBy);
 
                         const tdVideo = document.createElement('td');
+
                         const playButton = document.createElement('button');
                         playButton.textContent = 'Play Video';
                         playButton.className = 'btn btn-primary';
@@ -425,7 +426,24 @@ mysqli_close($conn);
                            $('#videoModal').modal('show');
                         };
                         tdVideo.appendChild(playButton);
+
+                        <?php if($_SESSION['role'] == 'administrator') { ?>
+                        const downloadButton = document.createElement('button');
+                        downloadButton.textContent = 'download';
+                        downloadButton.className = 'btn btn-success mx-2';
+                        downloadButton.onclick = function() {
+                           const videoSrc = `videos/${item.video_name}.${item.extension}`;
+                           const link = document.createElement('a');
+                           link.href = videoSrc;
+                           link.download = `${item.video_name}.${item.extension}`;
+                           document.body.appendChild(link);
+                           link.click();
+                           document.body.removeChild(link);
+                        };
+                        tdVideo.appendChild(downloadButton);
+                        <?php } ?>
                         tr.appendChild(tdVideo);
+
 
                         
                         //td action
