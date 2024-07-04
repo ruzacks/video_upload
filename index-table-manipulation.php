@@ -17,6 +17,7 @@
         pagination.empty();
 
         const totalPages = Math.ceil(totalItems / itemsPerPage);
+        const maxPagesToShow = 10; // Number of page links to show
 
         // Previous button
         const prev = $('<li class="page-item"><a class="page-link">Previous</a></li>');
@@ -24,25 +25,68 @@
             prev.addClass("disabled");
         } else {
             prev.click(function() {
-                    currentPage--;
-                    displayPage(currentPage);
-                    setupPagination(totalItems, itemsPerPage); // Re-setup pagination after page change
+                currentPage--;
+                displayPage(currentPage);
+                setupPagination(totalItems, itemsPerPage); // Re-setup pagination after page change
             });
         }
         pagination.append(prev);
 
+        // First page button
+        if (currentPage > 1) {
+            const firstPage = $('<li class="page-item"><a class="page-link">First</a></li>');
+            firstPage.click(function() {
+                currentPage = 1;
+                displayPage(currentPage);
+                setupPagination(totalItems, itemsPerPage); // Re-setup pagination after page change
+            });
+            pagination.append(firstPage);
+        }
+
+        // Calculate start and end page numbers
+        let startPage = Math.max(currentPage - Math.floor(maxPagesToShow / 2), 1);
+        let endPage = Math.min(startPage + maxPagesToShow - 1, totalPages);
+
+        // Adjust start and end if they exceed the total pages
+        if (endPage - startPage + 1 < maxPagesToShow) {
+            startPage = Math.max(endPage - maxPagesToShow + 1, 1);
+        }
+
+        // Ellipsis before start page
+        if (startPage > 1) {
+            const ellipsisBefore = $('<li class="page-item disabled"><a class="page-link">...</a></li>');
+            pagination.append(ellipsisBefore);
+        }
+
         // Page numbers
-        for (let i = 1; i <= totalPages; i++) {
+        for (let i = startPage; i <= endPage; i++) {
             const page = $(`<li class="page-item"><a class="page-link">${i}</a></li>`);
             if (i === currentPage) {
-                    page.addClass("active");
+                page.addClass("active");
             }
             page.click(function() {
-                    currentPage = i;
-                    displayPage(currentPage);
-                    setupPagination(totalItems, itemsPerPage); // Re-setup pagination after page change
+                currentPage = i;
+                displayPage(currentPage);
+                setupPagination(totalItems, itemsPerPage); // Re-setup pagination after page change
             });
             pagination.append(page);
+        }
+
+        // Ellipsis after end page
+        if (endPage < totalPages) {
+            const ellipsisAfter = $('<li class="page-item disabled"><a class="page-link">...</a></li>');
+            pagination.append(ellipsisAfter);
+        }
+
+        // Last page button
+        if (currentPage < totalPages) {
+            const lastPage = $('<li class="page-item"><a class="page-link">Last</a></li>');
+            lastPage.click(function() {
+                currentPage = totalPages;
+                displayPage(currentPage);
+                setupPagination(totalItems, itemsPerPage); // Re-setup pagination after page change
+            });
+            pagination.append(lastPage);
         }
 
         // Next button
@@ -51,9 +95,9 @@
             next.addClass("disabled");
         } else {
             next.click(function() {
-                    currentPage++;
-                    displayPage(currentPage);
-                    setupPagination(totalItems, itemsPerPage); // Re-setup pagination after page change
+                currentPage++;
+                displayPage(currentPage);
+                setupPagination(totalItems, itemsPerPage); // Re-setup pagination after page change
             });
         }
         pagination.append(next);
