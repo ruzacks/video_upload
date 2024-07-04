@@ -531,7 +531,7 @@ mysqli_close($conn);
             const pagination = $("#pagination");
             pagination.empty();
 
-            const maxPagesToShow = 20; // Number of page links to show
+            const maxPagesToShow = 10; // Number of page links to show
 
             // Previous button
             const prev = $('<li class="page-item"><a class="page-link">Previous</a></li>');
