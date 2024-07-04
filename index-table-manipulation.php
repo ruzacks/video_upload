@@ -12,52 +12,85 @@
         return null;
     }
 
-    function setupPagination(totalItems, itemsPerPage) {
-        const pagination = $("#pagination");
-        pagination.empty();
+    function setupPagination(totalItems, itemsPerPage, currentPage, totalPages) {
+    const pagination = $("#pagination");
+    pagination.empty();
 
-        const totalPages = Math.ceil(totalItems / itemsPerPage);
+    const maxPagesToShow = 20; // Number of page links to show
 
-        // Previous button
-        const prev = $('<li class="page-item"><a class="page-link">Previous</a></li>');
-        if (currentPage === 1) {
-            prev.addClass("disabled");
-        } else {
-            prev.click(function() {
-                    currentPage--;
-                    displayPage(currentPage);
-                    setupPagination(totalItems, itemsPerPage); // Re-setup pagination after page change
-            });
-        }
-        pagination.append(prev);
-
-        // Page numbers
-        for (let i = 1; i <= totalPages; i++) {
-            const page = $(`<li class="page-item"><a class="page-link">${i}</a></li>`);
-            if (i === currentPage) {
-                    page.addClass("active");
-            }
-            page.click(function() {
-                    currentPage = i;
-                    displayPage(currentPage);
-                    setupPagination(totalItems, itemsPerPage); // Re-setup pagination after page change
-            });
-            pagination.append(page);
-        }
-
-        // Next button
-        const next = $('<li class="page-item"><a class="page-link">Next</a></li>');
-        if (currentPage === totalPages) {
-            next.addClass("disabled");
-        } else {
-            next.click(function() {
-                    currentPage++;
-                    displayPage(currentPage);
-                    setupPagination(totalItems, itemsPerPage); // Re-setup pagination after page change
-            });
-        }
-        pagination.append(next);
+    // Previous button
+    const prev = $('<li class="page-item"><a class="page-link">Previous</a></li>');
+    if (currentPage === 1) {
+        prev.addClass("disabled");
+    } else {
+        prev.click(function() {
+            getDataDesa(currentPage - 1);
+        });
     }
+    pagination.append(prev);
+
+    // First page button
+    if (currentPage > 1) {
+        const firstPage = $('<li class="page-item"><a class="page-link">First</a></li>');
+        firstPage.click(function() {
+            getDataDesa(1);
+        });
+        pagination.append(firstPage);
+    }
+
+    // Calculate start and end page numbers
+    let startPage = Math.max(currentPage - Math.floor(maxPagesToShow / 2), 1);
+    let endPage = Math.min(startPage + maxPagesToShow - 1, totalPages);
+
+    // Adjust start and end if they exceed the total pages
+    if (endPage - startPage + 1 < maxPagesToShow) {
+        startPage = Math.max(endPage - maxPagesToShow + 1, 1);
+    }
+
+    // Ellipsis before start page
+    if (startPage > 2) {
+        const ellipsisBefore = $('<li class="page-item disabled"><a class="page-link">...</a></li>');
+        pagination.append(ellipsisBefore);
+    }
+
+    // Page numbers
+    for (let i = startPage; i <= endPage; i++) {
+        const page = $(`<li class="page-item"><a class="page-link">${i}</a></li>`);
+        if (i === currentPage) {
+            page.addClass("active");
+        }
+        page.click(function() {
+            getDataDesa(i);
+        });
+        pagination.append(page);
+    }
+
+    // Ellipsis after end page
+    if (endPage < totalPages - 1) {
+        const ellipsisAfter = $('<li class="page-item disabled"><a class="page-link">...</a></li>');
+        pagination.append(ellipsisAfter);
+    }
+
+    // Last page button
+    if (currentPage < totalPages) {
+        const lastPage = $('<li class="page-item"><a class="page-link">Last</a></li>');
+        lastPage.click(function() {
+            getDataDesa(totalPages);
+        });
+        pagination.append(lastPage);
+    }
+
+    // Next button
+    const next = $('<li class="page-item"><a class="page-link">Next</a></li>');
+    if (currentPage === totalPages) {
+        next.addClass("disabled");
+    } else {
+        next.click(function() {
+            getDataDesa(currentPage + 1);
+        });
+    }
+    pagination.append(next);
+}
 
     function displayPage(page) {
         const tableBody = $("#table-ektp tbody");

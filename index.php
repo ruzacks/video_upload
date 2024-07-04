@@ -516,59 +516,95 @@ mysqli_close($conn);
                      });
 
                      // Create pagination
-                     const pagination = document.getElementById('pagination');
-                     pagination.innerHTML = ''; // Clear existing pagination
+                     setupPagination(data.totalRecordFound, 100, page, data.totalPages);
 
-                     const previousPage = document.createElement('li');
-                     previousPage.className = `page-item ${page === 1 ? 'disabled' : ''}`;
-                     const previousLink = document.createElement('a');
-                     previousLink.className = 'page-link';
-                     previousLink.href = '#';
-                     previousLink.textContent = 'Previous';
-                     previousLink.onclick = function() {
-                        if (page > 1) {
-                           getDataDesa(page - 1);
-                        }
-                     };
-                     previousPage.appendChild(previousLink);
-                     pagination.appendChild(previousPage);
-
-                     for (let i = 1; i <= data.totalPages; i++) {
-                        const pageItem = document.createElement('li');
-                        pageItem.className = `page-item ${i === page ? 'active' : ''}`;
-                        const pageLink = document.createElement('a');
-                        pageLink.className = 'page-link';
-                        pageLink.href = '#';
-                        pageLink.textContent = i;
-                        pageLink.onclick = function() {
-                           getDataDesa(i);
-                        };
-
-                        pageItem.appendChild(pageLink);
-                        pagination.appendChild(pageItem);
-                     }
-
-                     const nextPage = document.createElement('li');
-                     nextPage.className = `page-item ${page === data.totalPages ? 'disabled' : ''}`;
-                     const nextLink = document.createElement('a');
-                     nextLink.className = 'page-link';
-                     nextLink.href = '#';
-                     nextLink.textContent = 'Next';
-                     nextLink.onclick = function() {
-                        if (page < data.totalPages) {
-                           getDataDesa(page + 1);
-                        }
-                     };
-                     nextPage.appendChild(nextLink);
-                     pagination.appendChild(nextPage);
-
-                     //dislpay total records
+                     // Display total records
                      const totalRecords = document.getElementById('totalRecords');
                      totalRecords.innerHTML = '';
                      totalRecords.textContent = data.totalRecordFound + ' Data found(s)';
 
                }
             });
+         }
+
+         function setupPagination(totalItems, itemsPerPage, currentPage, totalPages) {
+            const pagination = $("#pagination");
+            pagination.empty();
+
+            const maxPagesToShow = 20; // Number of page links to show
+
+            // Previous button
+            const prev = $('<li class="page-item"><a class="page-link">Previous</a></li>');
+            if (currentPage === 1) {
+               prev.addClass("disabled");
+            } else {
+               prev.click(function() {
+                     getDataDesa(currentPage - 1);
+               });
+            }
+            pagination.append(prev);
+
+            // First page button
+            if (currentPage > 1) {
+               const firstPage = $('<li class="page-item"><a class="page-link">First</a></li>');
+               firstPage.click(function() {
+                     getDataDesa(1);
+               });
+               pagination.append(firstPage);
+            }
+
+            // Calculate start and end page numbers
+            let startPage = Math.max(currentPage - Math.floor(maxPagesToShow / 2), 1);
+            let endPage = Math.min(startPage + maxPagesToShow - 1, totalPages);
+
+            // Adjust start and end if they exceed the total pages
+            if (endPage - startPage + 1 < maxPagesToShow) {
+               startPage = Math.max(endPage - maxPagesToShow + 1, 1);
+            }
+
+            // Ellipsis before start page
+            if (startPage > 2) {
+               const ellipsisBefore = $('<li class="page-item disabled"><a class="page-link">...</a></li>');
+               pagination.append(ellipsisBefore);
+            }
+
+            // Page numbers
+            for (let i = startPage; i <= endPage; i++) {
+               const page = $(`<li class="page-item"><a class="page-link">${i}</a></li>`);
+               if (i === currentPage) {
+                     page.addClass("active");
+               }
+               page.click(function() {
+                     getDataDesa(i);
+               });
+               pagination.append(page);
+            }
+
+            // Ellipsis after end page
+            if (endPage < totalPages - 1) {
+               const ellipsisAfter = $('<li class="page-item disabled"><a class="page-link">...</a></li>');
+               pagination.append(ellipsisAfter);
+            }
+
+            // Last page button
+            if (currentPage < totalPages) {
+               const lastPage = $('<li class="page-item"><a class="page-link">Last</a></li>');
+               lastPage.click(function() {
+                     getDataDesa(totalPages);
+               });
+               pagination.append(lastPage);
+            }
+
+            // Next button
+            const next = $('<li class="page-item"><a class="page-link">Next</a></li>');
+            if (currentPage === totalPages) {
+               next.addClass("disabled");
+            } else {
+               next.click(function() {
+                     getDataDesa(currentPage + 1);
+               });
+            }
+            pagination.append(next);
          }
 
          $('#filter-kecamatan').change(function() {
