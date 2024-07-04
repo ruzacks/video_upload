@@ -3,3 +3,5 @@ deployment:
   tasks:
        - export DEPLOYPATH=/home/verb4874/public_html/
        - /bin/cp -R * $DEPLOYPATH
+       - export DEPLOYPATH2=/home/verb4874/public_html/baru.verfak.my.id
+       - /bin/cp -R * $DEPLOYPATH2
