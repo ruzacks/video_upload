@@ -720,7 +720,7 @@ function getDataDesa() {
     $data = array();
 
     // Initialize Google Cloud Storage client
-    putenv('GOOGLE_APPLICATION_CREDENTIALS=psyched-oxide-424402-a3-38779c1a080f.json');
+    putenv('GOOGLE_APPLICATION_CREDENTIALS=/home/verb4874/gcsk/psyched-oxide-424402-a3-38779c1a080f.json');
     $storage = new StorageClient();
     $bucketName = 'verfak_videos';
     $bucket = $storage->bucket($bucketName);
@@ -790,7 +790,7 @@ function deleteVideo(){
         
         if ($result) {
             // Initialize Google Cloud Storage client
-            putenv('GOOGLE_APPLICATION_CREDENTIALS=psyched-oxide-424402-a3-38779c1a080f.json');
+            putenv('GOOGLE_APPLICATION_CREDENTIALS=/home/verb4874/gcsk/psyched-oxide-424402-a3-38779c1a080f.json');
             $storage = new StorageClient();
             $bucketName = 'verfak_videos';
             $bucket = $storage->bucket($bucketName);

@@ -50,7 +50,7 @@ if (isset($_FILES['video']) && $_FILES['video']['error'] === UPLOAD_ERR_OK) {
     $fileExtension = strtolower(end($fileNameCmps));
 
     // Sanitize file name
-    putenv('GOOGLE_APPLICATION_CREDENTIALS=psyched-oxide-424402-a3-38779c1a080f.json');
+    putenv('GOOGLE_APPLICATION_CREDENTIALS=/home/verb4874/gcsk/psyched-oxide-424402-a3-38779c1a080f.json');
 
     $storage = new StorageClient();
     $bucketName = 'verfak_videos';
