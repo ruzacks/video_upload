@@ -6,6 +6,8 @@ session_start();
 
 require 'vendor/autoload.php';
 
+use Google\Cloud\Storage\StorageClient;
+
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use PhpOffice\PhpSpreadsheet\Cell\DataType;
@@ -717,7 +719,23 @@ function getDataDesa() {
     $result = mysqli_query($conn, $sql);
     $data = array();
 
+    // Initialize Google Cloud Storage client
+    putenv('GOOGLE_APPLICATION_CREDENTIALS=psyched-oxide-424402-a3-38779c1a080f.json');
+    $storage = new StorageClient();
+    $bucketName = 'verfak_videos';
+    $bucket = $storage->bucket($bucketName);
+
     while ($row = mysqli_fetch_assoc($result)) {
+        // Generate the signed URL for each video
+        $videoName = $row['video_name'];
+        $extension = $row['extension'];
+        $objectName = "$videoName.$extension";
+        $object = $bucket->object($objectName);
+        $url = $object->signedUrl(new \DateTime('1 hour'));
+
+        // Add the signed URL to the row
+        $row['download_url'] = $url;
+        
         $data[] = $row;
     }
 
@@ -734,16 +752,17 @@ function getDataDesa() {
 
 
 function deleteVideo(){
+    
     $response = [];
-    if($_SESSION['role'] == 'korcam' || $_SESSION['role'] == 'kordes'){
+    
+    if ($_SESSION['role'] == 'korcam' || $_SESSION['role'] == 'kordes') {
         $response['status'] = "error";
-        $response['message'] = "You don't have previlege to delete!";
-
+        $response['message'] = "You don't have privilege to delete!";
+        
         header('Content-Type: application/json');
         echo json_encode($response);
         exit();
     }
-
 
     $conn = getConn();
     if ($conn === false) {
@@ -754,31 +773,51 @@ function deleteVideo(){
         return;
     }
 
-    
     $nik = $_POST['id'];
     $video = $_POST['id_video'];
-   
-    $sqlDelete = "DELETE from videos WHERE nik = '$nik'";
-    $result = $conn->query($sqlDelete);
 
-    
-    if ($result) {
-        $filePath = '/home/verb4874/public_html/videos/'.$video;
-        if (file_exists($filePath)) {
-            unlink($filePath);
+    // Fetch the video details from the database
+    $sqlSelect = "SELECT video_name, extension FROM videos WHERE nik = '$nik'";
+    $resultSelect = $conn->query($sqlSelect);
+    if ($resultSelect->num_rows > 0) {
+        $row = $resultSelect->fetch_assoc();
+        $videoName = $row['video_name'];
+        $extension = $row['extension'];
+        
+        // Delete the record from the database
+        $sqlDelete = "DELETE FROM videos WHERE nik = '$nik'";
+        $result = $conn->query($sqlDelete);
+        
+        if ($result) {
+            // Initialize Google Cloud Storage client
+            putenv('GOOGLE_APPLICATION_CREDENTIALS=psyched-oxide-424402-a3-38779c1a080f.json');
+            $storage = new StorageClient();
+            $bucketName = 'verfak_videos';
+            $bucket = $storage->bucket($bucketName);
+
+            // Delete the video from Google Cloud Storage
+            $objectName = "$videoName.$extension";
+            $object = $bucket->object($objectName);
+            if ($object->exists()) {
+                $object->delete();
+                $response['status'] = "success";
+                $response['message'] = "Data and file deleted successfully";
+            } else {
+                $response['status'] = "success";
+                $response['message'] = "Data deleted, but file not found in Google Cloud Storage";
+            }
         } else {
-            echo 'file not found';
-            exit();
+            $response['status'] = "error";
+            $response['message'] = "Failed to delete data from database";
         }
-        $response['status'] = "success";
-        $response['message'] = "Data Deleted";
     } else {
         $response['status'] = "error";
-        $response['message'] = "Failed to delete";
+        $response['message'] = "Video not found in the database";
     }
-    
+
     header('Content-Type: application/json');
     echo json_encode($response);
+    $conn->close();
 }
 
 

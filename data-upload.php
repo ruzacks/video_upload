@@ -346,17 +346,17 @@
                         data: formData,
                         contentType: false, // Required for FormData
                         processData: false, // Required for FormData
-                        xhr: function() {
-                            const xhr = new window.XMLHttpRequest();
-                            xhr.upload.addEventListener('progress', function(evt) {
-                                if (evt.lengthComputable) {
-                                    const percentComplete = Math.round((evt.loaded / evt.total) * 100);
-                                    document.getElementById('progress-bar').value = percentComplete;
-                                    document.getElementById('upload-status').textContent = `${percentComplete}%`;
-                                }
-                            }, false);
-                            return xhr;
-                        },
+                        // xhr: function() {
+                        //     const xhr = new window.XMLHttpRequest();
+                        //     xhr.upload.addEventListener('progress', function(evt) {
+                        //         if (evt.lengthComputable) {
+                        //             const percentComplete = Math.round((evt.loaded / evt.total) * 100);
+                        //             document.getElementById('progress-bar').value = percentComplete;
+                        //             document.getElementById('upload-status').textContent = `${percentComplete}%`;
+                        //         }
+                        //     }, false);
+                        //     return xhr;
+                        // },
                         success: function(response) {
                             Swal.close();
                             Swal.fire({

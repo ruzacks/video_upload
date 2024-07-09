@@ -1,5 +1,9 @@
 <?php
 include ('connection.php');
+require 'vendor/autoload.php';
+
+use Google\Cloud\Storage\StorageClient;
+
 session_start();
 
 $conn = getConn();
@@ -46,41 +50,45 @@ if (isset($_FILES['video']) && $_FILES['video']['error'] === UPLOAD_ERR_OK) {
     $fileExtension = strtolower(end($fileNameCmps));
 
     // Sanitize file name
+    putenv('GOOGLE_APPLICATION_CREDENTIALS=psyched-oxide-424402-a3-38779c1a080f.json');
+
+    $storage = new StorageClient();
+    $bucketName = 'verfak_videos';
+
+    // Your existing code to get the file details
     $newFileName = $nik . '.' . $fileExtension;
 
     // Check if the file is a video
     $allowedfileExtensions = array('mp4', 'avi', 'mov', 'mkv', 'webm');
     if (in_array($fileExtension, $allowedfileExtensions)) {
-        // Directory to save the uploaded video file
-        // Ensure the directory path ends with a slash or backslash
-        $uploadFileDir = $myPath;
-        
-        $dest_path = $uploadFileDir . $newFileName;
+        $bucket = $storage->bucket($bucketName);
 
-        if (move_uploaded_file($fileTmpPath, $dest_path)) {
-            // File is successfully uploaded
-            $videoFilePath = 'videos/' . $newFileName;
+        // Upload the file to Google Cloud Storage
+        $object = $bucket->upload(
+            fopen($fileTmpPath, 'r'),
+            ['name' => $newFileName]
+        );
 
-            try {
-                if ($stmt->execute()) {
-                    $response['status'] = "success";
-                    $response['message'] = "Data saved successfully";
-                    $response['video_path'] = $videoFilePath;
-                }
-            } catch (mysqli_sql_exception $e) {
-                $error_message = $e->getMessage();
-                if (strpos($error_message, "Duplicate entry") !== false) {
-                    $response['status'] = "error";
-                    $response['message'] = "NIK sudah terdaftar";
-                } else {
-                    unlink($dest_path); // Remove the uploaded video file if there's an error
-                    $response['status'] = "error";
-                    $response['message'] = "Error: " . $error_message;
-                }
+        // File is successfully uploaded
+        $videoFilePath = 'videos/' . $newFileName;
+
+        try {
+            if ($stmt->execute()) {
+                $response['status'] = "success";
+                $response['message'] = "Data saved successfully";
+                $response['video_path'] = $videoFilePath;
             }
-        } else {
-            $response['status'] = "error";
-            $response['message'] = "There was an error moving the uploaded file.";
+        } catch (mysqli_sql_exception $e) {
+            $error_message = $e->getMessage();
+            if (strpos($error_message, "Duplicate entry") !== false) {
+                $response['status'] = "error";
+                $response['message'] = "NIK sudah terdaftar";
+            } else {
+                // Delete the file from Google Cloud Storage if there's an error
+                $object->delete();
+                $response['status'] = "error";
+                $response['message'] = "Error: " . $error_message;
+            }
         }
     } else {
         $response['status'] = "error";

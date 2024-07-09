@@ -420,7 +420,7 @@ mysqli_close($conn);
                         playButton.textContent = 'Play';
                         playButton.className = 'btn btn-primary';
                         playButton.onclick = function() {
-                           const videoSrc = `videos/${item.video_name}.${item.extension}`;
+                           const videoSrc = `${item.download_url}`;
                            document.getElementById('videoModalLabel').textContent = item.video_name;
                            document.getElementById('videoPlayer').src = videoSrc;
                            $('#videoModal').modal('show');
@@ -432,9 +432,8 @@ mysqli_close($conn);
                         downloadButton.textContent = 'Download';
                         downloadButton.className = 'btn btn-success mx-1';
                         downloadButton.onclick = function() {
-                           const videoSrc = `videos/${item.video_name}.${item.extension}`;
                            const link = document.createElement('a');
-                           link.href = videoSrc;
+                           link.href = item.download_url; // Use the signed URL provided by the server
                            link.download = `${item.video_name}.${item.extension}`;
                            document.body.appendChild(link);
                            link.click();
