@@ -38,18 +38,23 @@ function findMissingFiles($localFiles, $gcsFiles) {
     return array_diff($localFileNames, $gcsFileNames);
 }
 
-function createZipFile($missingFiles, $localDirectory, $zipFilename) {
+function createZipFile($missingFiles, $localDirectory, $zipFilename, $limit = 300) {
     // Initialize zip archive
     $zip = new ZipArchive();
     if ($zip->open($zipFilename, ZipArchive::CREATE) !== TRUE) {
         exit("Cannot open $zipFilename\n");
     }
 
-    // Add each missing file to the zip archive
+    // Add each missing file to the zip archive, limited to the specified number of files
+    $count = 0;
     foreach ($missingFiles as $file) {
+        if ($count >= $limit) {
+            break;
+        }
         $filePath = $localDirectory . '/' . $file;
         if (file_exists($filePath)) {
             $zip->addFile($filePath, $file);
+            $count++;
         } else {
             echo "File not found: $file<br>";
         }
@@ -66,8 +71,8 @@ $gcsFiles = listGcsFiles($gcsBucketName);
 // Find missing files
 $missingFiles = findMissingFiles($localFiles, $gcsFiles);
 
-// Create a zip file containing the missing files
-createZipFile($missingFiles, $localDirectory, $zipFilename);
+// Create a zip file containing up to 300 missing files
+createZipFile($missingFiles, $localDirectory, $zipFilename, 300);
 
 // Function to create download link for the zip file
 function createDownloadLink($zipFilename) {
