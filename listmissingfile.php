@@ -10,6 +10,8 @@ putenv('GOOGLE_APPLICATION_CREDENTIALS=/home/verb4874/gcsk/psyched-oxide-424402-
 // Define your directories and bucket name
 $localDirectory = __DIR__ . '/videos';
 $txtFilename = 'missing_files.txt';
+$tempTxtFilename = 'temp_missing_files.txt';
+
 function getCurrentDomain() {
     return $_SERVER['HTTP_HOST'];
 }
@@ -52,6 +54,13 @@ function createTxtFile($missingFiles, $txtFilename) {
     file_put_contents($txtFilename, implode(PHP_EOL, $missingFiles));
 }
 
+function renameFileTwice($originalFilename, $tempFilename) {
+    if (file_exists($originalFilename)) {
+        rename($originalFilename, $tempFilename); // Rename to temporary filename
+        rename($tempFilename, $originalFilename); // Rename back to original filename
+    }
+}
+
 function createDownload($txtFilename) {
     if (file_exists($txtFilename)) {
         header('Content-Type: text/plain');
@@ -78,6 +87,9 @@ $missingFiles = findMissingFiles($localFiles, $gcsFiles);
 
 // Create a text file with the list of missing files
 createTxtFile($missingFiles, $txtFilename);
+
+// Rename the file twice to update last modified time
+renameFileTwice($txtFilename, $tempTxtFilename);
 
 // Create a downloadable text file
 createDownload($txtFilename);
