@@ -9,7 +9,17 @@ putenv('GOOGLE_APPLICATION_CREDENTIALS=/home/verb4874/gcsk/psyched-oxide-424402-
 
 // Define your directories and bucket name
 $localDirectory = __DIR__ . '/videos';
-$gcsBucketName = 'verfak_videos_2';
+function getCurrentDomain() {
+    return $_SERVER['HTTP_HOST'];
+}
+
+// Determine the bucket name based on the current domain
+$currentDomain = getCurrentDomain();
+if ($currentDomain === 'baru.verfak.my.id') {
+    $gcsBucketName = 'verfak_videos_new_2';
+} else {
+    $gcsBucketName = 'verfak_videos_2';
+}
 
 function listLocalFiles($directory) {
     $files = array_diff(scandir($directory), ['.', '..']);
