@@ -722,7 +722,19 @@ function getDataDesa() {
     // Initialize Google Cloud Storage client
     putenv('GOOGLE_APPLICATION_CREDENTIALS=/home/verb4874/gcsk/psyched-oxide-424402-a3-38779c1a080f.json');
     $storage = new StorageClient();
-    $bucketName = 'verfak_videos';
+
+    function getCurrentDomain() {
+        return $_SERVER['HTTP_HOST'];
+    }
+    
+    // Determine the bucket name based on the current domain
+    $currentDomain = getCurrentDomain();
+    if ($currentDomain === 'baru.verfak.my.id') {
+        $bucketName = 'verfak_videos_new';
+    } else {
+        $bucketName = 'verfak_videos';
+    }
+
     $bucket = $storage->bucket($bucketName);
 
     while ($row = mysqli_fetch_assoc($result)) {
@@ -792,7 +804,19 @@ function deleteVideo(){
             // Initialize Google Cloud Storage client
             putenv('GOOGLE_APPLICATION_CREDENTIALS=/home/verb4874/gcsk/psyched-oxide-424402-a3-38779c1a080f.json');
             $storage = new StorageClient();
-            $bucketName = 'verfak_videos';
+
+            function getCurrentDomain() {
+                return $_SERVER['HTTP_HOST'];
+            }
+
+            // Determine the bucket name based on the current domain
+            $currentDomain = getCurrentDomain();
+            if ($currentDomain === 'baru.verfak.my.id') {
+                $bucketName = 'verfak_videos_new';
+            } else {
+                $bucketName = 'verfak_videos';
+            }
+            
             $bucket = $storage->bucket($bucketName);
 
             // Delete the video from Google Cloud Storage

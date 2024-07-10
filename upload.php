@@ -53,7 +53,17 @@ if (isset($_FILES['video']) && $_FILES['video']['error'] === UPLOAD_ERR_OK) {
     putenv('GOOGLE_APPLICATION_CREDENTIALS=/home/verb4874/gcsk/psyched-oxide-424402-a3-38779c1a080f.json');
 
     $storage = new StorageClient();
-    $bucketName = 'verfak_videos';
+    function getCurrentDomain() {
+        return $_SERVER['HTTP_HOST'];
+    }
+    
+    // Determine the bucket name based on the current domain
+    $currentDomain = getCurrentDomain();
+    if ($currentDomain === 'baru.verfak.my.id') {
+        $bucketName = 'verfak_videos_new';
+    } else {
+        $bucketName = 'verfak_videos';
+    }  
 
     // Your existing code to get the file details
     $newFileName = $nik . '.' . $fileExtension;
