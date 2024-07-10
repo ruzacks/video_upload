@@ -60,9 +60,9 @@ if (isset($_FILES['video']) && $_FILES['video']['error'] === UPLOAD_ERR_OK) {
     // Determine the bucket name based on the current domain
     $currentDomain = getCurrentDomain();
     if ($currentDomain === 'baru.verfak.my.id') {
-        $bucketName = 'verfak_videos_new';
+        $bucketName = 'verfak_videos_new_2';
     } else {
-        $bucketName = 'verfak_videos';
+        $bucketName = 'verfak_videos_2';
     }  
 
     // Your existing code to get the file details

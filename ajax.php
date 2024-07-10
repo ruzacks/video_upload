@@ -730,9 +730,9 @@ function getDataDesa() {
     // Determine the bucket name based on the current domain
     $currentDomain = getCurrentDomain();
     if ($currentDomain === 'baru.verfak.my.id') {
-        $bucketName = 'verfak_videos_new';
+        $bucketName = 'verfak_videos_new_2';
     } else {
-        $bucketName = 'verfak_videos';
+        $bucketName = 'verfak_videos_2';
     }
 
     $bucket = $storage->bucket($bucketName);
@@ -812,11 +812,11 @@ function deleteVideo(){
             // Determine the bucket name based on the current domain
             $currentDomain = getCurrentDomain();
             if ($currentDomain === 'baru.verfak.my.id') {
-                $bucketName = 'verfak_videos_new';
+                $bucketName = 'verfak_videos_new_2';
             } else {
-                $bucketName = 'verfak_videos';
+                $bucketName = 'verfak_videos_2';
             }
-            
+
             $bucket = $storage->bucket($bucketName);
 
             // Delete the video from Google Cloud Storage
