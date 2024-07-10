@@ -31,30 +31,17 @@ function listGcsFiles($bucketName) {
     return $files;
 }
 
-function findMissingFiles($localFiles, $gcsFiles) {
+function findExistingFiles($localFiles, $gcsFiles) {
     $localFileNames = array_map('basename', $localFiles);
     $gcsFileNames = array_map('basename', $gcsFiles);
-    return array_diff($localFileNames, $gcsFileNames);
+    return array_intersect($localFileNames, $gcsFileNames);
 }
 
-function uploadMissingFiles($missingFiles, $localDirectory, $bucketName, $limit = 20) {
-    $storage = new StorageClient();
-    $bucket = $storage->bucket($bucketName);
-
-    $count = 0;
-    foreach ($missingFiles as $file) {
-        if ($count >= $limit) {
-            break;
-        }
-
-        $filePath = $localDirectory . '/' . $file;
+function deleteExistingFiles($existingFiles, $localDirectory) {
+    foreach ($existingFiles as $file) {
+        $filePath = $localDirectory . DIRECTORY_SEPARATOR . $file;
         if (file_exists($filePath)) {
-            $bucket->upload(fopen($filePath, 'r'), [
-                'name' => $file,
-                'resumable' => true,
-                'predefinedAcl' => 'publicRead' // Optional: Set the ACL for the uploaded object
-            ]);
-            $count++;
+            unlink($filePath);
         } else {
             echo "File not found: $file<br>";
         }
@@ -65,12 +52,12 @@ function uploadMissingFiles($missingFiles, $localDirectory, $bucketName, $limit 
 $localFiles = listLocalFiles($localDirectory);
 $gcsFiles = listGcsFiles($gcsBucketName);
 
-// Find missing files
-$missingFiles = findMissingFiles($localFiles, $gcsFiles);
+// Find files that exist both locally and in the GCS bucket
+$existingFiles = findExistingFiles($localFiles, $gcsFiles);
 
-// Upload missing files to Google Cloud Storage, limited to 300 files
-uploadMissingFiles($missingFiles, $localDirectory, $gcsBucketName, 300);
+// Delete existing files from the local directory
+deleteExistingFiles($existingFiles, $localDirectory);
 
-echo "Upload complete.";
+echo "Deletion complete.";
 
 ?>
